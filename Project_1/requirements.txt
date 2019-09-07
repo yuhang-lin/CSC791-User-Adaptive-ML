@@ -1,0 +1,5 @@
+numpy
+pandas
+sklearn == 0.21.3
+impyute == 0.0.8
+missingpy == 0.2.0
