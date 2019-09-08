@@ -13,8 +13,8 @@ from base import impute_df
 data_folder = './train_data'
 estimators = [
     DecisionTreeRegressor(max_features='sqrt', random_state=0),
-    ExtraTreesRegressor(n_estimators=10, random_state=0),
-    KNeighborsRegressor(n_neighbors=15)
+    ExtraTreesRegressor(n_estimators=30, random_state=0),
+    KNeighborsRegressor(n_neighbors=5)
 ]
 max_iter = 10
 
