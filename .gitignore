@@ -1,4 +1,10 @@
 #Pycharm
 *.idea/
+# OS x files
 .DS_Store
 */.DS_Store
+__MACOSX/
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
