@@ -6,7 +6,6 @@ def impute_df(imputer, output_folder, data_folder):
     patients = pd.read_csv("{}/pts.tr.csv".format(data_folder), header=None) 
     for patient in patients.iloc[:, 0]:
         input_df = pd.read_csv("{}/train_with_missing/{}.csv".format(data_folder, patient))
-        imputer = IterativeImputer(max_iter=20, random_state=0)
         imputed_df = pd.DataFrame(imputer.fit_transform(input_df))
         imputed_df.columns = input_df.columns
         imputed_df.index = input_df.index
