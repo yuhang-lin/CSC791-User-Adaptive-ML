@@ -8,3 +8,6 @@ __MACOSX/
 .Spotlight-V100
 .Trashes
 Thumbs.db
+
+__pycache__/
+.ipynb_checkpoints
