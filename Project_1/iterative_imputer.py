@@ -3,28 +3,25 @@
 # Copyright 2019 Yuhang Lin
 
 import numpy as np
-import pandas as pd
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
-import os
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from base import impute_df
 
 data_folder = './train_data'
-output_folder = "./output/iterative_imputer"
+estimators = [
+    DecisionTreeRegressor(max_features='sqrt', random_state=0),
+    ExtraTreesRegressor(n_estimators=10, random_state=0),
+    KNeighborsRegressor(n_neighbors=15)
+]
+max_iter = 10
 
-try:
-    os.makedirs(output_folder)
-except FileExistsError:
-    # directory already exists
-    pass
-
-patients = pd.read_csv("{}/pts.tr.csv".format(data_folder), header=None)
-
-for patient in patients.iloc[:, 0]:
-    input_df = pd.read_csv("{}/train_with_missing/{}.csv".format(data_folder, patient))
-    fill_NaN = IterativeImputer(max_iter=20, random_state=0)
-    imputed_df = pd.DataFrame(fill_NaN.fit_transform(input_df))
-    imputed_df.columns = input_df.columns
-    imputed_df.index = input_df.index
-    imputed_df.to_csv("{}/{}.csv".format(output_folder, patient), index=False)
-    del input_df
-    del imputed_df
+names = ['decisiontree', 'extratrees', 'knn']
+for i in range(len(estimators)):
+    name = names[i]
+    estimator = estimators[i]
+    output_folder = "./output/iterative_imputer_{}_iter{}".format(name, max_iter)
+    imputer = IterativeImputer(max_iter=max_iter, random_state=0, estimator=estimator)
+    impute_df(imputer, output_folder, data_folder)
