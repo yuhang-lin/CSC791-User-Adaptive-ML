@@ -1,0 +1,7 @@
+Counts of missing value per analyte over all patients is: [    0.  7708.  7935.  8019.  7821. 23978. 27778. 27983. 27008. 27317.
+ 28166.  7083.  7014.  9933.]
+Average number of missing values per analyte is: 15553.07142857143
+SD of number of missing values per analyte is: 10204.659996185817
+Mean number of rows over all patients is: 24.1655
+Median number of rows over all patients is: 19.0
+SD of number of rows over all patients is: 17.638965665537192
