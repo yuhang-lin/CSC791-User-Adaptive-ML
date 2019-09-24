@@ -1,12 +1,16 @@
 import pandas as pd
 import numpy as np
 
-# To switch between ground truth and missing data, please change the 'data' parameter to the function below
-def summary_per_analyte(data_choice, data_folder = './train_data'):
-    if data_choice == 'G':
-        data = '/train_groundtruth/'
-    else:
-        data = '/train_with_missing/'
+def summary_per_analyte(data_choice, data_type, data_folder):
+    if data_type == 'train':
+        if data_choice == 'G':
+            data = '/train_groundtruth/'
+        else:
+            data = '/train_with_missing/'
+
+    if data_type == 'test':
+        data = '/test_with_missing/'
+
     patients = pd.read_csv("{}/pts.tr.csv".format(data_folder), header=None)
     first_patient = pd.read_csv("{}{}{}.csv".format(data_folder, data, 1))
 
@@ -45,7 +49,7 @@ def summary_per_analyte(data_choice, data_folder = './train_data'):
 
 
 
-def patients_stats(data_folder = './train_data'):
+def patients_stats(data_folder):
     patients = pd.read_csv("{}/pts.tr.csv".format(data_folder), header=None)
     print('Number of patients: {}'.format(len(patients.iloc[:,0])))
 
@@ -60,7 +64,8 @@ def patients_stats(data_folder = './train_data'):
     print(masked_value)
 
 
-# Choose between 'G' for train_groundtruth and 'M' for train_with_missing
-summary_per_analyte(data_choice='M')
-
-# patients_stats()
+# Choose data choice between 'G' for groundtruth and 'M' for missing
+# Choose data type between 'train' and 'test'.
+# Choose data folder between './train_data' and './test_data'
+summary_per_analyte(data_choice='M', data_type='test', data_folder='./test_data')
+patients_stats(data_folder='./test_data')
