@@ -1,4 +1,4 @@
-# CSC591ML
+# Assigned Project 1
 
 Before you start running this project, please unzip Baseline.zip, train_data.zip and test_data.zip under the directory of the code. 
 
