@@ -1,3 +1,9 @@
+###################################################################
+#Script Name	: prepare.sh                                                                                             
+#Description	: Prepare a new pts.tr.csv file, reindex all the test files to start from 1 then move them to the 'train_with_missing' folder.
+#Author       	:Yuhang Lin                                               
+#Email         	:ylin34@ncsu.edu                                          
+###################################################################
 # fill in pts.tr.csv 
 patients_file="./train_data/pts.tr.csv"
 echo "1" > $patients_file
