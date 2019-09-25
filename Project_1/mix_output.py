@@ -5,11 +5,11 @@
 import os
 import pandas as pd
 
-model_dir1 = './Baseline/MICE_train_imputed'
-model_dir2 = './output/iterative_imputer_extratrees_iter40'
-data_dir = './train_data'
-columns_1 = ["X5", "X6"] # the columns from model 1
-output_dir = "./output/mice_extratrees_40"
+model_dir1 = './test_output/3d-mice-test'
+model_dir2 = './test_output/iterative_imputer_extratrees_iter40'
+data_dir = './test_data'
+columns_1 = ["time", "X5", "X6"] # the columns from model 1
+output_dir = "./test_output/mice_extratrees_40"
 
 patients = pd.read_csv("{}/pts.tr.csv".format(data_dir), header=None)
 os.makedirs(output_dir, exist_ok=True)
@@ -19,7 +19,6 @@ for patient in patients.iloc[:, 0]:
     # replace those columns by the same columns from model 1
     for i in range(len(columns_1)):
         df_2[columns_1[i]] = df_1[columns_1[i]]
-    df_2.to_csv("{}/{}.csv".format(output_dir, patient), index=False)
+    df_2.to_csv("{}/{}.csv".format(output_dir, patient), index=False, float_format='%.9f')
     del df_1
     del df_2
-
