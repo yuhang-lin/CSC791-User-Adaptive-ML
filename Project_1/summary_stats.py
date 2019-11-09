@@ -67,5 +67,5 @@ def patients_stats(data_folder):
 # Choose data choice between 'G' for groundtruth and 'M' for missing
 # Choose data type between 'train' and 'test'.
 # Choose data folder between './train_data' and './test_data'
-summary_per_analyte(data_choice='M', data_type='test', data_folder='./test_data')
+# summary_per_analyte(data_choice='M', data_type='test', data_folder='./test_data')
 patients_stats(data_folder='./test_data')
