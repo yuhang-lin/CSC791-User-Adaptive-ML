@@ -221,7 +221,7 @@ def induce_policy_MDP(filename):
 
     # evaluate policy using ECR
     ECR_value = calcuate_ECR(start_states, vi.V)
-    print('ECR value: ' + str(ECR_value))
+    # print('ECR value: ' + str(ECR_value))
 
 
     # calculate Q-value based on MDP
@@ -232,7 +232,7 @@ def induce_policy_MDP(filename):
 
     # evaluate policy using Importance Sampling
     IS_value = calculate_IS(filename, distinct_acts, distinct_states, Q, 0.9, 0.1)
-    print('IS value: ' + str(IS_value))
+    # print('IS value: ' + str(IS_value))
     
     return ECR_value, IS_value
 
