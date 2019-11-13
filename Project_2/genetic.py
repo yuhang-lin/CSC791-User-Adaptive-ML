@@ -27,7 +27,7 @@ def get_value(hist, features, use_ECR):
         IS_value = hist[key][1]
     else:
         filename = "temp.csv"
-        prepare(features, "binned_org_order.csv", filename)
+        prepare(features, "binned_2_reorder.csv", filename)
         ECR_value, IS_value = MDP_policy.induce_policy_MDP(filename)
         data = [ECR_value, IS_value]
         data.extend(features)
@@ -48,7 +48,7 @@ def mutate(parent, feature_list, num_mutate):
         child_features[i] = new_features[i]
     return sorted(child_features)
 
-def main(num_feature=8, num_generation=10, use_ECR=True, num_child=10, num_mutate=2):
+def main(num_feature=8, num_generation=10, use_ECR=True, num_child=15, num_mutate=2):
     """
     num_feature # number of features
     num_generation # number of generation
@@ -66,6 +66,7 @@ def main(num_feature=8, num_generation=10, use_ECR=True, num_child=10, num_mutat
     hist = get_history(num_feature)
     parent_value = get_value(hist, parent, use_ECR)
     for i in range(num_generation):
+        print("Generation {}, parent value: {}".format(i, parent_value))
         best_value = None
         best_child = None
         for j in range(num_child):
