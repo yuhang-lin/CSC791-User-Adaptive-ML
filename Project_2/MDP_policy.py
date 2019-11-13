@@ -217,7 +217,7 @@ def induce_policy_MDP(filename):
     vi.run()
 
     # output policy
-    output_policy(distinct_acts, distinct_states, vi)
+    #output_policy(distinct_acts, distinct_states, vi)
 
     # evaluate policy using ECR
     ECR_value = calcuate_ECR(start_states, vi.V)
