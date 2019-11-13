@@ -201,13 +201,14 @@ def calculate_IS(filename, distinct_acts, distinct_states, Q, gamma, theta):
     return IS
 
 def induce_policy_MDP():
-
     # extract filename from command
     parser = argparse.ArgumentParser()
     parser.add_argument("-input")
     args = parser.parse_args()
     filename = args.input
+    induce_policy_MDP(filename)
 
+def induce_policy_MDP(filename):
     # load data set with selected or extracted discrete features
     [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input(filename)
 
