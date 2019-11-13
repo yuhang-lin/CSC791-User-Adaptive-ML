@@ -8,6 +8,11 @@ from exportCSV import exportCSV
 import os
 
 def get_history(num_feature):
+    """
+    Reading the csv file and save the order history record of the features
+    :param num_feature:
+    :return: map of history (key: features, values: list of ECR,IS values)
+    """
     hist = dict()
     hist_file = "{}.csv".format(num_feature)
     if not os.path.isfile(hist_file):
@@ -48,14 +53,18 @@ def mutate(parent, feature_list, num_mutate):
         child_features[i] = new_features[i]
     return sorted(child_features)
 
+
 def main(num_feature=8, num_generation=10, use_ECR=True, num_child=15, num_mutate=2):
     """
-    num_feature # number of features
-    num_generation # number of generation
-    use_ECR # selection based on ECR if true
-    num_child # number of children in one generation
-    num_mutate # number of features being mutated at a time
+    function which should be called to invoke the genetic algorithm
+    :param num_feature: Number of features
+    :param num_generation: Number of generation
+    :param use_ECR: Selection based on ECR if true
+    :param num_child: Number of children in one generation
+    :param num_mutate: Number of features being mutated at a time
+    :return:
     """
+
     num_feature = max(min(num_feature, 8), 1) # set a max value of 8 and min value of 1
     # all possible features indices you can choose
     feature_list = [i for i in range(6, 130)]
