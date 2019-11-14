@@ -7,6 +7,13 @@ from prepare import prepare
 from exportCSV import exportCSV
 import os
 import gc
+from timeit import default_timer
+
+def count_time(last_time, message):
+    diff = default_timer() - last_time
+    print("{}: {}".format(message, diff))
+    last_time += diff
+    return last_time
 
 def get_history(num_feature):
     """
@@ -75,9 +82,11 @@ def main(num_feature=8, num_generation=10, use_ECR=True, num_child=15, num_mutat
 
     hist = get_history(num_feature)
     parent_value = get_value(hist, parent, use_ECR)
+    last_time = default_timer()
     for i in range(num_generation):
         if i % 3 == 2:
             gc.collect()
+        last_time = count_time(last_time, "")
         print("Generation {}, parent value: {}".format(i, parent_value))
         best_value = None
         best_child = None
