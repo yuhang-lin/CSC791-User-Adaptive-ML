@@ -6,8 +6,21 @@ import MDP_policy
 from prepare import prepare
 from exportCSV import exportCSV
 import os
+import gc
+from timeit import default_timer
+
+def count_time(last_time, message):
+    diff = default_timer() - last_time
+    print("{}: {}".format(message, diff))
+    last_time += diff
+    return last_time
 
 def get_history(num_feature):
+    """
+    Reading the csv file and save the order history record of the features
+    :param num_feature:
+    :return: map of history (key: features, values: list of ECR,IS values)
+    """
     hist = dict()
     hist_file = "{}.csv".format(num_feature)
     if not os.path.isfile(hist_file):
@@ -27,7 +40,7 @@ def get_value(hist, features, use_ECR):
         IS_value = hist[key][1]
     else:
         filename = "temp.csv"
-        prepare(features, "binned_org_order.csv", filename)
+        prepare(features, "binned_3_reorder.csv", filename)
         ECR_value, IS_value = MDP_policy.induce_policy_MDP(filename)
         data = [ECR_value, IS_value]
         data.extend(features)
@@ -48,14 +61,18 @@ def mutate(parent, feature_list, num_mutate):
         child_features[i] = new_features[i]
     return sorted(child_features)
 
-def main(num_feature=8, num_generation=10, use_ECR=True, num_child=10, num_mutate=2):
+
+def main(num_feature=8, num_generation=10, use_ECR=True, num_child=15, num_mutate=2):
     """
-    num_feature # number of features
-    num_generation # number of generation
-    use_ECR # selection based on ECR if true
-    num_child # number of children in one generation
-    num_mutate # number of features being mutated at a time
+    function which should be called to invoke the genetic algorithm
+    :param num_feature: Number of features
+    :param num_generation: Number of generation
+    :param use_ECR: Selection based on ECR if true
+    :param num_child: Number of children in one generation
+    :param num_mutate: Number of features being mutated at a time
+    :return:
     """
+
     num_feature = max(min(num_feature, 8), 1) # set a max value of 8 and min value of 1
     # all possible features indices you can choose
     feature_list = [i for i in range(6, 130)]
@@ -65,7 +82,12 @@ def main(num_feature=8, num_generation=10, use_ECR=True, num_child=10, num_mutat
 
     hist = get_history(num_feature)
     parent_value = get_value(hist, parent, use_ECR)
+    last_time = default_timer()
     for i in range(num_generation):
+        if i % 3 == 2:
+            gc.collect()
+        last_time = count_time(last_time, "")
+        print("Generation {}, parent value: {}".format(i, parent_value))
         best_value = None
         best_child = None
         for j in range(num_child):
