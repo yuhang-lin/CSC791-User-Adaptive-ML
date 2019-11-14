@@ -6,6 +6,7 @@ import MDP_policy
 from prepare import prepare
 from exportCSV import exportCSV
 import os
+import gc
 
 def get_history(num_feature):
     """
@@ -32,7 +33,7 @@ def get_value(hist, features, use_ECR):
         IS_value = hist[key][1]
     else:
         filename = "temp.csv"
-        prepare(features, "binned_2_reorder.csv", filename)
+        prepare(features, "binned_3_reorder.csv", filename)
         ECR_value, IS_value = MDP_policy.induce_policy_MDP(filename)
         data = [ECR_value, IS_value]
         data.extend(features)
@@ -75,6 +76,8 @@ def main(num_feature=8, num_generation=10, use_ECR=True, num_child=15, num_mutat
     hist = get_history(num_feature)
     parent_value = get_value(hist, parent, use_ECR)
     for i in range(num_generation):
+        if i % 3 == 2:
+            gc.collect()
         print("Generation {}, parent value: {}".format(i, parent_value))
         best_value = None
         best_child = None
