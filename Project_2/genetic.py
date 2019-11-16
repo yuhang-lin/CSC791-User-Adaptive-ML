@@ -45,11 +45,12 @@ class Genetic():
             IS_value = self.hist[key][1]
         else:
             filename = "temp.csv"
-            prepare(features, "binned_2_reorder.csv", filename)
+            prepare(features, "binned_3_reorder.csv", filename)
             ECR_value, IS_value = MDP_policy.induce_policy_MDP(filename)
             data = [ECR_value, IS_value]
             data.extend(features)
             exportCSV(data, "{}.csv".format(len(features)))
+            self.hist[key] = [float(ECR_value), float(IS_value)]
         curr_value = ECR_value
         if not use_ECR:
             curr_value = IS_value
@@ -57,7 +58,7 @@ class Genetic():
 
     def mutate(self, single, max_mutate):
         # make sure the number of mutation is no more than the length of the features
-        num_mutate = random.randint(1, min(max_mutate + 1, len(single)))
+        num_mutate = random.randint(0, min(max_mutate + 1, len(single)))
         choice_list = [e for e in self.feature_list if e not in single]
         if num_mutate > 0:
             new_features = random.sample(choice_list, num_mutate)
@@ -86,7 +87,7 @@ class Genetic():
             population[i].sort()
 
 
-    def main(self, num_feature=8, num_parent=3, num_generation=10, use_ECR=False, population_size=12, max_mutate=4):
+    def main(self, num_feature=8, num_parent=4, num_generation=8, use_ECR=True, population_size=12, max_mutate=8):
         """
         function which should be called to invoke the genetic algorithm
         :param num_feature: Number of features
