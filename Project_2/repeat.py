@@ -1,7 +1,7 @@
 from genetic import Genetic
 
 def repeat(length, numRound=20):
-    genetic = Genetic()
+    genetic = Genetic(2)
     for i in range(numRound):
         genetic.main(length)
 

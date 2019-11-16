@@ -10,10 +10,13 @@ import gc
 from timeit import default_timer
 
 class Genetic():
-    def __init__(self):
+    def __init__(self, num_bin):
         # all possible features indices you can choose
         self.feature_list = [i for i in range(6, 130)]
         self.hist = dict()
+        self.num_bin = int(num_bin) # this should be an integer
+        if self.num_bin < 2:
+            print("Error: number of bins is reset to be 2")
     
     def count_time(self, last_time, message):
         diff = default_timer() - last_time
@@ -45,11 +48,11 @@ class Genetic():
             IS_value = self.hist[key][1]
         else:
             filename = "temp.csv"
-            prepare(features, "binned_3_reorder.csv", filename)
+            prepare(features, "binned_{}_reorder.csv".format(self.num_bin), filename)
             ECR_value, IS_value = MDP_policy.induce_policy_MDP(filename)
             data = [ECR_value, IS_value]
             data.extend(features)
-            exportCSV(data, "{}.csv".format(len(features)))
+            exportCSV(data, "bin_{}_history/{}.csv".format(self.num_bin, len(features)))
             self.hist[key] = [float(ECR_value), float(IS_value)]
         curr_value = ECR_value
         if not use_ECR:
