@@ -15,13 +15,13 @@ We can't guarantee the feature subset size
 Should I be using a continuous PSO optimizer?
 Is function a cost or performance
 
-"""
+""";
 
 
 # In[2]:
 
 
-#get_ipython().system('pip3 install pyswarms;')
+#get_ipython().run_cell_magic('capture', '', '!pip3 install pyswarms')
 
 
 # In[3]:
@@ -31,22 +31,25 @@ import numpy as np
 import pandas as pd
 import MDP_policy
 import prepare
-import random
-
 import pyswarms as ps
+
+import random
+# Some more magic so that the notebook will reload external python modules;
+# see http://stackoverflow.com/questions/1907993/autoreload-of-modules-in-ipython
+get_ipython().run_line_magic('load_ext', 'autoreload')
+get_ipython().run_line_magic('autoreload', '2')
+get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # In[4]:
 
 
-'''
 RANDOM_SEED = 42
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
-'''
 
 
-# In[ ]:
+# In[5]:
 
 
 # optimize MDP_policy.induce_policy_MDP()
@@ -84,7 +87,7 @@ def get_value_func_per_particle(input_feature_masks, use_ECR=True):
     '''
 
 
-# In[ ]:
+# In[6]:
 
 
 # outer function
@@ -96,22 +99,24 @@ def get_value_func_outer(particles):
     return np.array(j)
 
 
-# In[7]:
+# In[ ]:
 
 
 # Initialize swarm, arbitrary
-options = {'c1': 0.5, 'c2': 0.5, 'w':0.9, 'k': 10, 'p':2}
+options = {'c1': 0.5, 'c2': 0.5, 'w':0.7, 'k': 5, 'p':2}
+#options = {'c1': 0.5, 'c2': 0.3, 'w':0.9}
 
 # Call instance of PSO
 dimensions = 124 # dimensions should be the number of features
-optimizer = ps.discrete.BinaryPSO(n_particles=30, dimensions=dimensions, options=options)
+optimizer = ps.discrete.BinaryPSO(n_particles=5, dimensions=dimensions, options=options)
+#optimizer = ps.single.GlobalBestPSO(n_particles=30, dimensions=dimensions, options=options)
 
 # Perform optimization
 output_cost, output_pos = optimizer.optimize(get_value_func_outer, iters=5)
 
 # Output chosen features 
-print("Value: %.4f"%(output_cost))
-print("Feature pos: " + output_pos)
+print("Value: {}".format(output_cost))
+print("Feature pos: {}".format(output_pos))
 
 
 # In[ ]:

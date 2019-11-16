@@ -1,9 +1,8 @@
+import pandas as pd
+import seaborn as sn
+import matplotlib.pyplot as plt
 
 def find_correlation(file, corr_op):
-    import pandas as pd
-    import seaborn as sn
-    import matplotlib.pyplot as plt
-
     df = pd.read_csv(file)
     best_columns = df.iloc[:, [76, 77, 88, 102, 110, 111, 121, 128]]
     print(best_columns)
