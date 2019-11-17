@@ -1,0 +1,6 @@
+numpy
+pandas
+pymdptoolbox
+seaborn
+matplotlib
+pyswarms
