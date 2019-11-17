@@ -40,9 +40,9 @@ from exportCSV import exportCSV
 import random
 # Some more magic so that the notebook will reload external python modules;
 # see http://stackoverflow.com/questions/1907993/autoreload-of-modules-in-ipython
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('matplotlib', 'inline')
+#get_ipython().run_line_magic('load_ext', 'autoreload')
+#get_ipython().run_line_magic('autoreload', '2')
+#get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # In[12]:
@@ -67,7 +67,7 @@ print_filename = "pso_output.csv"
 
 # optimize MDP_policy.induce_policy_MDP()
 # make negative if function is a cost
-def get_value_func_per_particle(input_feature_masks, ):
+def get_value_func_per_particle(input_feature_masks):
     # input_feature_masks type: np ndarray
     
     # set up features from mask
@@ -126,11 +126,12 @@ def execute_swarm(n_particles_arg, dimensions_arg, iters_arg):
     # Perform optimization
     output_cost, output_pos = optimizer.optimize(get_value_func_outer, iters=iters_arg)
 
-    # Output chosen features 
+    # Output chosen features
     final_val = -output_cost
-    final_features = np.where(output_pos)
+    final_feature_pos = np.where(output_pos)
     feature_names = pd.read_csv(input_filename).columns.tolist()
-    final_feature_names = features_names[final_features]
+    for i in range(final_feature_pos.len()):
+        final_feature_names.append(feature_names[final_feature_pos[i]])
     
     exportCSV([final_val, final_features, final_feature_names], fileName=print_filename)
     print("Value: {}".format(final_val))
