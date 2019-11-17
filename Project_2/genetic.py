@@ -90,7 +90,7 @@ class Genetic():
             population[i].sort()
 
 
-    def main(self, num_feature=8, num_parent=4, num_generation=8, use_ECR=True, population_size=12, max_mutate=8):
+    def main(self, num_feature=8, num_parent=4, num_generation=10, use_ECR=False, population_size=16, max_mutate=8):
         """
         function which should be called to invoke the genetic algorithm
         :param num_feature: Number of features
