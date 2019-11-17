@@ -206,9 +206,9 @@ def induce_policy_MDP():
     parser.add_argument("-input")
     args = parser.parse_args()
     filename = args.input
-    induce_policy_MDP(filename)
+    induce_policy_MDP(filename, print_policy=True)
 
-def induce_policy_MDP(filename):
+def induce_policy_MDP(filename, print_policy=False):
     # load data set with selected or extracted discrete features
     [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input(filename)
 
@@ -217,7 +217,8 @@ def induce_policy_MDP(filename):
     vi.run()
 
     # output policy
-    #output_policy(distinct_acts, distinct_states, vi)
+    if print_policy:
+        output_policy(distinct_acts, distinct_states, vi)
 
     # evaluate policy using ECR
     ECR_value = calcuate_ECR(start_states, vi.V)
@@ -233,6 +234,10 @@ def induce_policy_MDP(filename):
     # evaluate policy using Importance Sampling
     IS_value = calculate_IS(filename, distinct_acts, distinct_states, Q, 0.9, 0.1)
     # print('IS value: ' + str(IS_value))
+    
+    if print_policy:
+        print('ECR value: ' + str(ECR_value))
+        print('IS value: ' + str(IS_value))
     
     return ECR_value, IS_value
 
