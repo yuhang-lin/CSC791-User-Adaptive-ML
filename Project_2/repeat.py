@@ -6,6 +6,6 @@ def repeat(length, numRound=20):
         genetic.main(length)
 
 if __name__ == "__main__":
-    repeat(4, 3)
-    repeat(5, 3)
-    repeat(6, 3)
+    num_round = 5
+    for i in range(4, 9):
+        repeat(i, num_round)
