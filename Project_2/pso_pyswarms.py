@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[9]:
 
 
 """
@@ -18,13 +18,16 @@ Is function a cost or performance
 """;
 
 
-# In[2]:
+# In[10]:
 
 
-#get_ipython().run_cell_magic('capture', '', '!pip3 install pyswarms')
+'''
+%%capture
+!pip3 install pyswarms
+'''
 
 
-# In[3]:
+# In[11]:
 
 
 import numpy as np
@@ -32,6 +35,7 @@ import pandas as pd
 import MDP_policy
 import prepare
 import pyswarms as ps
+from exportCSV import exportCSV
 
 import random
 # Some more magic so that the notebook will reload external python modules;
@@ -41,23 +45,30 @@ get_ipython().run_line_magic('autoreload', '2')
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[4]:
+# In[12]:
 
 
-RANDOM_SEED = 42
+RANDOM_SEED = 56
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# In[5]:
+# In[ ]:
+
+
+input_filename = "binned_2_reorder.csv"
+output_filename = "pso_training_data.csv"
+use_ECR = True
+print_filename = "pso_output.csv"
+
+
+# In[13]:
 
 
 # optimize MDP_policy.induce_policy_MDP()
 # make negative if function is a cost
-def get_value_func_per_particle(input_feature_masks, use_ECR=True):
+def get_value_func_per_particle(input_feature_masks, ):
     # input_feature_masks type: np ndarray
-    input_filename = "MDP_Original_data.csv"
-    output_filename = "pso_training_data.csv"
     
     # set up features from mask
     #print(input_feature_masks)
@@ -87,7 +98,7 @@ def get_value_func_per_particle(input_feature_masks, use_ECR=True):
     '''
 
 
-# In[6]:
+# In[14]:
 
 
 # outer function
@@ -99,24 +110,35 @@ def get_value_func_outer(particles):
     return np.array(j)
 
 
-# In[ ]:
+# In[16]:
 
 
-# Initialize swarm, arbitrary
-options = {'c1': 0.5, 'c2': 0.5, 'w':0.7, 'k': 5, 'p':2}
-#options = {'c1': 0.5, 'c2': 0.3, 'w':0.9}
+def execute_swarm(n_particles_arg, dimensions_arg, iters_arg):
+    # Initialize swarm, arbitrary
+    options = {'c1': 0.5, 'c2': 0.3, 'w':0.7, 'k': 35, 'p':2}
+    #options = {'c1': 0.5, 'c2': 0.3, 'w':0.9}
 
-# Call instance of PSO
-dimensions = 124 # dimensions should be the number of features
-optimizer = ps.discrete.BinaryPSO(n_particles=5, dimensions=dimensions, options=options)
-#optimizer = ps.single.GlobalBestPSO(n_particles=30, dimensions=dimensions, options=options)
+    # Call instance of PSO
+    # dimensions should be the number of features
+    optimizer = ps.discrete.BinaryPSO(n_particles=35, dimensions=dimensions_arg, options=options)
+    #optimizer = ps.single.GlobalBestPSO(n_particles=30, dimensions=dimensions, options=options)
 
-# Perform optimization
-output_cost, output_pos = optimizer.optimize(get_value_func_outer, iters=5)
+    # Perform optimization
+    output_cost, output_pos = optimizer.optimize(get_value_func_outer, iters=iters_arg)
 
-# Output chosen features 
-print("Value: {}".format(output_cost))
-print("Feature pos: {}".format(output_pos))
+    # Output chosen features 
+    final_val = -output_cost
+    final_features = np.where(output_pos)
+    feature_names = pd.read_csv(input_filename).columns.tolist()
+    final_feature_names = features_names[final_features]
+    
+    exportCSV([final_val, final_features, final_feature_names], fileName=print_filename)
+    print("Value: {}".format(final_val))
+    print("Feature pos: {}".format(final_features))
+    print("Feature names: {}".format(final_feature_names))
+    print("Feature names: {}".format(final_feature_names))
+    
+    return final_val, final_features, final_feature_names
 
 
 # In[ ]:
