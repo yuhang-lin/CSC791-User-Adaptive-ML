@@ -4,3 +4,4 @@ pymdptoolbox
 seaborn
 matplotlib
 pyswarms
+sklearn
