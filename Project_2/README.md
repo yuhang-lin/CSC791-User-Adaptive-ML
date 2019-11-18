@@ -17,7 +17,7 @@ All the CSV files in `bin_{2,3,4,5}_history`
 
 ## Feature Selection 
 ### Genetic Algorithm
-`python3 repeat.py` will call `genetic.py` to run some iterations of genetic algorithm for searching for some features. The log is saved in `bin_NUM_history` folder where NUM is the number of bins from 2 to 5.  
+`python3 repeat.py` will call `genetic.py` to run some iterations of genetic algorithm to select up to 8 features. The log is saved in `bin_NUM_history` folder where NUM is the number of bins from 2 to 5. When it runs, a CSV file named `temp.csv` will be created as input to `MDP_policy.py` to evaluate the selected features.  
 Please change the parameters in `repeat.py` to do feature selection using other number of bins and number of features.  
 
 ### PSO Algorithm  
