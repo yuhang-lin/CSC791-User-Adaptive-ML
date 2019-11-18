@@ -200,14 +200,6 @@ def calculate_IS(filename, distinct_acts, distinct_states, Q, gamma, theta):
     IS = float(IS) / len(student_list)
     return IS
 
-def induce_policy_MDP():
-    # extract filename from command
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-input")
-    args = parser.parse_args()
-    filename = args.input
-    induce_policy_MDP(filename, print_policy=True)
-
 def induce_policy_MDP(filename, print_policy=False):
     # load data set with selected or extracted discrete features
     [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input(filename)
@@ -243,4 +235,9 @@ def induce_policy_MDP(filename, print_policy=False):
 
 
 if __name__ == "__main__":
-    induce_policy_MDP()
+    # extract filename from command
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-input")
+    args = parser.parse_args()
+    filename = args.input
+    induce_policy_MDP(filename, print_policy=True)
