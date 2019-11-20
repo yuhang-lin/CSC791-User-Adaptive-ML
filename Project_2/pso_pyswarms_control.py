@@ -47,14 +47,14 @@ iters_arg = 2           # 10
 
 # Execute
 val, final_feature_names, _ = pso_pyswarms.execute_swarm(n_particles_arg, dimensions_arg, iters_arg)
-dimensions_arg = final_feature_names.len()
+dimensions_arg = len(final_feature_names)
 delta = val
 
-while (delta < 2 or dimensions_arg < 3):
+while (delta > 2 or dimensions_arg > 3):
     print("current dimensions: {}".format(dimensions_arg))
     pso_pyswarms.input_filename = "pso_training_data.csv"
     final_val, final_feature_names, _ = pso_pyswarms.execute_swarm(n_particles_arg, dimensions_arg, iters_arg)
-    dimensions_arg = final_feature_names.len()
+    dimensions_arg = len(final_feature_names)
     delta = final_val - val 
     print("delta: {}".format(delta))
     val = final_val
