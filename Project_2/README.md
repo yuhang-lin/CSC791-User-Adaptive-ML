@@ -6,6 +6,17 @@
 ### IS
 `python3 MDP_policy.py -input Training_data_is.csv` will run the MDP program and get the best IS value along with its policy. 
 
+## Necessary packages
+```
+numpy
+pandas
+pymdptoolbox
+seaborn
+matplotlib
+pyswarms
+sklearn
+```
+
 ## All Data Used
 `binned_{2,3,4,5}_reorder.csv` 
 
