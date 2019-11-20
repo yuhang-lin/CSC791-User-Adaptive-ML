@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
+# In[1]:
 
 
 """
@@ -13,7 +13,7 @@ https://pyswarms.readthedocs.io/en/latest/examples/usecases/feature_subset_selec
 """;
 
 
-# In[6]:
+# In[2]:
 
 
 import numpy as np
@@ -27,34 +27,34 @@ import pso_pyswarms
 import random
 
 
-# In[7]:
+# In[3]:
 
 
 # MDP file setup
 pso_pyswarms.input_filename = "binned_2_reorder.csv"
 pso_pyswarms.output_filename = "pso_training_data.csv"
 pso_pyswarms.print_filename = "pso_output.csv"
-pso_pyswarms.use_ECR = True #  False
+pso_pyswarms.use_ECR = True # True, False
 
 
 # In[ ]:
 
 
 # PSO parameters
-n_particles_arg = 40
+n_particles_arg = 2     # 40
 dimensions_arg = 124
-iters_arg = 3
+iters_arg = 2           # 10
 
 # Execute
-val, final_features, final_feature_names = pso_pyswarms.execute_swarm(n_particles_arg, dimensions_arg, iters_arg)
-dimensions_arg = final_features.len()
+val, final_feature_names, _ = pso_pyswarms.execute_swarm(n_particles_arg, dimensions_arg, iters_arg)
+dimensions_arg = final_feature_names.len()
 delta = val
 
 while (delta < 2 or dimensions_arg < 3):
     print("current dimensions: {}".format(dimensions_arg))
     pso_pyswarms.input_filename = "pso_training_data.csv"
-    final_val, final_features, final_feature_names = pso_pyswarms.execute_swarm(n_particles_arg, dimensions_arg, iters_arg)
-    dimensions_arg = final_features.len()
+    final_val, final_feature_names, _ = pso_pyswarms.execute_swarm(n_particles_arg, dimensions_arg, iters_arg)
+    dimensions_arg = final_feature_names.len()
     delta = final_val - val 
     print("delta: {}".format(delta))
     val = final_val

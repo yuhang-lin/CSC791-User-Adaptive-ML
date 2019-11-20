@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[1]:
 
 
 """
@@ -18,7 +18,7 @@ Is function a cost or performance
 """;
 
 
-# In[10]:
+# In[2]:
 
 
 '''
@@ -27,7 +27,7 @@ Is function a cost or performance
 '''
 
 
-# In[11]:
+# In[3]:
 
 
 import numpy as np
@@ -45,7 +45,7 @@ import random
 #get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[12]:
+# In[4]:
 
 
 RANDOM_SEED = 56
@@ -53,7 +53,7 @@ random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-# In[ ]:
+# In[5]:
 
 
 input_filename = "binned_2_reorder.csv"
@@ -62,7 +62,7 @@ use_ECR = True
 print_filename = "pso_output.csv"
 
 
-# In[13]:
+# In[6]:
 
 
 # optimize MDP_policy.induce_policy_MDP()
@@ -98,7 +98,7 @@ def get_value_func_per_particle(input_feature_masks):
     '''
 
 
-# In[14]:
+# In[7]:
 
 
 # outer function
@@ -110,7 +110,7 @@ def get_value_func_outer(particles):
     return np.array(j)
 
 
-# In[16]:
+# In[8]:
 
 
 def execute_swarm(n_particles_arg, dimensions_arg, iters_arg):
@@ -130,19 +130,19 @@ def execute_swarm(n_particles_arg, dimensions_arg, iters_arg):
     final_val = -output_cost
     final_feature_pos = np.squeeze(np.where(output_pos)).tolist()
     #print("pos {}".format(final_feature_pos))
-    feature_names = pd.read_csv(input_filename).columns.tolist()
+    checked_feature_names = pd.read_csv(input_filename).columns.tolist()
 
     final_feature_names = []
     for i in range(len(final_feature_pos)):
         feature_index = final_feature_pos[i]
         #print("index {}".format(feature_index))
-        final_feature_names.append(feature_names[feature_index])
+        final_feature_names.append(checked_feature_names[feature_index])
         #print("collection {}".format(final_feature_names))
 
-    exportCSV([final_val, final_features, final_feature_names], fileName=print_filename)
+    exportCSV([final_val, final_feature_names], fileName=print_filename)
     print("Value: {}".format(final_val))
-    print("Feature pos: {}".format(final_features))
-    print("Feature names: {}".format(final_feature_names))
-    print("Feature names: {}".format(final_feature_names))
+    #print("Feature pos: {}".format(final_feature_pos))
+    print("Features names selected:\n {}".format(final_feature_names))
+    #print("Feature names considered:\n {}".format(checked_feature_names))
     
-    return final_val, final_features, final_feature_names
+    return final_val, final_feature_names, checked_feature_names
