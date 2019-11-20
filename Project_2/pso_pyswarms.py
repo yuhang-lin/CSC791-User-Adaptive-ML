@@ -128,11 +128,17 @@ def execute_swarm(n_particles_arg, dimensions_arg, iters_arg):
 
     # Output chosen features
     final_val = -output_cost
-    final_feature_pos = np.where(output_pos)
+    final_feature_pos = np.squeeze(np.where(output_pos)).tolist()
+    #print("pos {}".format(final_feature_pos))
     feature_names = pd.read_csv(input_filename).columns.tolist()
-    for i in range(final_feature_pos.len()):
-        final_feature_names.append(feature_names[final_feature_pos[i]])
-    
+
+    final_feature_names = []
+    for i in range(len(final_feature_pos)):
+        feature_index = final_feature_pos[i]
+        #print("index {}".format(feature_index))
+        final_feature_names.append(feature_names[feature_index])
+        #print("collection {}".format(final_feature_names))
+
     exportCSV([final_val, final_features, final_feature_names], fileName=print_filename)
     print("Value: {}".format(final_val))
     print("Feature pos: {}".format(final_features))
@@ -140,10 +146,3 @@ def execute_swarm(n_particles_arg, dimensions_arg, iters_arg):
     print("Feature names: {}".format(final_feature_names))
     
     return final_val, final_features, final_feature_names
-
-
-# In[ ]:
-
-
-
-
