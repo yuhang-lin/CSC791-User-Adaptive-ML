@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 def find_correlation(file, corr_op):
     df = pd.read_csv(file)
@@ -14,7 +15,8 @@ def find_correlation(file, corr_op):
     # plot the heatmap
     plt.suptitle('correlation between different features', fontsize=16)
     plt.autoscale()
-    ax = sn.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, annot=True)
+    ax = sn.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, annot=False, annot_kws={"fontsize":11, "weight": "bold"}, cmap=ListedColormap(['gray']))
+
     plt.xticks(rotation=20)
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5)

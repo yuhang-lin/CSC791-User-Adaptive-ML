@@ -99,6 +99,8 @@ def calcuate_ECR(start_states, expectV):
 
 def output_policy(distinct_acts, distinct_states, vi):
     Ns = len(distinct_states)
+    print(distinct_states)
+    print(distinct_acts)
     print('Policy: ')
     print('state -> action, value-function')
     for s in range(Ns):
