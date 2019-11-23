@@ -4,30 +4,94 @@ import pandas as pd
 def read_user_data():
     """
     A function that reads all the user data and prepares them for future use
+    :return: a list of all the user data
+    """
+    
+    # path of the dataset
+    path = './EMG_data_for_gestures-master/'  
+    
+    # a list holding the data for all 36 users
+    user_data = []
+
+    for i in range(36):  # since there are 36 users
+        all_files = glob.glob(path + "{}/*.txt".format(i+1))
+        
+        # two files for each user, hence two dataframes
+        file = [pd.DataFrame() for _ in range(2)]
+        
+        # read both files for each user
+        for j, filename in enumerate(all_files):
+            file[j] = pd.read_csv(filename, sep = "\t")
+            
+        merged_df = pd.concat([file[0], file[1]], axis=0, ignore_index=True)
+        user_data.append(merged_df.sort_values(by=['time']))
+        
+    return user_data
+
+
+def get_summary_stats(user_data):
+    """
+    A function that computes the summary statistics of the list of user_data.
+    Print a file "summary_stats.txt" containing summary stats for all users.
+    :param user_data: A list of all the user data
     :return:
     """
 
-    path = './EMG_data_for_gestures-master/'  # use your path
+    columns = ["mean", "SD", "min", "max"]
 
-    li = []
+    summary_stats = []
+    for user in user_data:
+        means = user.mean(axis=0).to_frame()
+        std = user.std(axis=0).to_frame()
+        mini = user.min(axis=0).to_frame()
+        maxm = user.max(axis=0).to_frame()
+        result = pd.concat([means, std, mini, maxm], axis=1, ignore_index=True)
+        result.columns = columns
+        summary_stats.append(result)
 
-    for i in range(1, 37):  # since there are 37 users
-        all_files = glob.glob(path + "{}/*.txt".format(i))
-        print(all_files)
+    f = open("summary_stats.txt", "w+")
+    f.write("Summary stats for all users\n\n")
 
-        for filename in all_files:
-            df = pd.read_csv(filename, sep = "\t")
-            li.append(df)
+    for i, summary in enumerate(summary_stats):
+        f.write("---- user {} ----\n".format(i+1))
+        f.write(str(summary))
+        f.write("\n\n")
 
-            frame = pd.concat(li, axis=0, ignore_index=True)
-            print(frame)
-        frame = None
+    f.close()
 
 
+def get_class_distribution(user_data):
+    """
+    A function that prints the class distribution of the user data
+    Prints a file "class_distribution.txt" containing summary stats for all users
+    :param user_data: A list of all the user data
+    :return:
+    """
+    counts = []
 
-    # df = pd.read_csv("./EMG_data_for_gestures-master/{}/1_raw_data_13-12_22.03.16.txt".format(1), sep="\t")
-    # print(df)
+    for user in user_data:
+        count = pd.DataFrame(user['class'].value_counts())
+        counts.append(count)
 
-print(read_user_data())
+    return counts
+    
+
+"""
+Use the following code to run the files
+"""
+
+# get all the user data
+user_data = read_user_data()
+
+get_summary_stats(user_data)
+
+class_dis = get_class_distribution(user_data)
+print(class_dis)
+
+
+
+
+
+
 
 
