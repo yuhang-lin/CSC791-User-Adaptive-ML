@@ -24,8 +24,18 @@ def read_user_data():
             file[j] = pd.read_csv(filename, sep = "\t")
             
         merged_df = pd.concat([file[0], file[1]], axis=0, ignore_index=True)
-        user_data.append(merged_df.sort_values(by=['time']))
+        merged_df = merged_df.sort_values(by=['time'])
+
+        # TIMING INFO (will move to a different timing function if needed)
+        # insert new column of time intervals after sorting
+        subtract_operand = merged_df['time'].shift(1)
+        subtract_operand.at[0] = 0 
+        intervals = merged_df['time'] - subtract_operand
+        merged_df.insert(1, 'time_intervals', intervals)
+        #
         
+        user_data.append(merged_df)
+
     return user_data
 
 
@@ -37,8 +47,8 @@ def get_summary_stats(user_data):
     :return:
     """
 
-    columns = ["mean", "SD", "min", "max"]
-
+    columns = ["mean", "SD", "min", "max"]  # columns = ["mean", "SD", "min", "max", "median", "mode"]
+    
     summary_stats = []
     for user in user_data:
         means = user.mean(axis=0).to_frame()
@@ -74,7 +84,18 @@ def get_class_distribution(user_data):
         counts.append(count)
 
     return counts
+
+
+'''
+def get_timing_stats(user_data):
+    """
+    (If needed) A function that gathers timing specific stats for the data
+    :param user_data: A list of all the user data
+    :return:
+    """
     
+   
+'''
 
 """
 Use the following code to run the files
