@@ -29,7 +29,7 @@ def read_user_data():
         # TIMING INFO (will move to a different timing function if needed)
         # insert new column of time intervals after sorting
         subtract_operand = merged_df['time'].shift(1)
-        subtract_operand.at[0] = merged_df.at[0, 'time']
+        subtract_operand.at[0] = 0 
         intervals = merged_df['time'] - subtract_operand
         merged_df.insert(1, 'time_intervals', intervals)
         #
