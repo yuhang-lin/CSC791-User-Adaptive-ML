@@ -41,16 +41,16 @@ def evaluate_model(X_train, y_train, X_test, y_test):
         The accuracy of the trained and evaluated LSTM model.
 
     """
-	verbose, epochs, batch_size = 0, 15, 256
-	n_timesteps, n_features, n_outputs = X_train.shape[1], X_train.shape[2], y_train.shape[1]
-	model = tf.keras.Sequential()
-	model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))
-	model.add(tf.keras.layers.Dropout(0.5))
-	model.add(tf.keras.layers.Dense(100, activation='relu'))
-	model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
-	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-	# fit network
-	model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=verbose)
-	# evaluate model
-	_, accuracy = model.evaluate(X_test, y_test, batch_size=batch_size, verbose=0)
-	return accuracy
+    verbose, epochs, batch_size = 0, 15, 256
+    n_timesteps, n_features, n_outputs = X_train.shape[1], X_train.shape[2], y_train.shape[1]
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))
+    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dense(100, activation='relu'))
+    model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    # fit network
+    model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=verbose)
+    # evaluate model
+    _, accuracy = model.evaluate(X_test, y_test, batch_size=batch_size, verbose=0)
+    return accuracy
