@@ -196,7 +196,7 @@ def run_example():
     print("test samples: {}".format(x_test))
     print("pred labels samples: {}".format(y_pred))
     print("acc: {}, f1_score: {}".format(acc, f1))
-
+    return
 
 '''
 # HMM classifier wrapper (issues)
