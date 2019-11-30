@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
-from google.colab import drive
-drive.mount('/content/drive')
-
 import glob
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -17,155 +13,6 @@ import csv
 import numpy as np
 import tensorflow as tf
 
-def read_user_data():
-    """
-    A function that reads all the user data and prepares them for future use
-    :return: a list of all the user data
-    """
-    
-    # path of the dataset
-    path = './EMG_data_for_gestures-master/' 
-    
-    # a list holding the data for all 36 users
-    user_data = []
-
-    for i in range(36):  # since there are 36 users
-        all_files = glob.glob(path + "{}/*.txt".format(i+1))
-        
-        # two files for each user, hence two dataframes
-        file = [pd.DataFrame() for _ in range(2)]
-        
-        # read both files for each user
-        for j, filename in enumerate(all_files):
-            file[j] = pd.read_csv(filename, sep = "\t")
-            
-        merged_df = pd.concat([file[0], file[1]], axis=0, ignore_index=True)
-        #merged_df = file[0]
-        
-        #user_data.append(merged_df.sort_values(by=['time']))
-        user_data.append(merged_df)
-        
-    return user_data
-
-def get_summary_stats(user_data):
-    """
-    A function that computes the summary statistics of the list of user_data
-    """
-
-    columns = ["mean", "SD", "min", "max"]
-
-    summary_stats = []
-    for user in user_data:
-        means = user.mean(axis=0).to_frame()
-        std = user.std(axis=0).to_frame()
-        mini = user.min(axis=0).to_frame()
-        maxm = user.max(axis=0).to_frame()
-        result = pd.concat([means, std, mini, maxm], axis=1, ignore_index=True)
-        result.columns = columns
-        summary_stats.append(result)
-
-    f = open("summary_stats.txt", "w+")
-    f.write("Summary stats for all users\n\n")
-
-    for i, summary in enumerate(summary_stats):
-        f.write("---- user {} ----\n".format(i+1))
-        f.write(str(summary))
-        f.write("\n\n")
-
-    f.close()
-
-def get_class_distribution(user_data):
-    counts = []
-    
-    f = open("class_distribution.txt", "w+")
-    f.write("Class distributions stats for all users\n\n")
-    
-    for i, user in enumerate(user_data):
-        f.write("---- user {} ----\n".format(i+1))
-        count = pd.DataFrame(user['class'].value_counts())
-        f.write(str(count))
-        f.write("\n\n")
-        counts.append(count)
-        
-    f.close()
-        
-    return counts
-
-# get all the user data
-user_data = read_user_data()
-
-# drop null values
-for user in user_data:
-    user.dropna(inplace=True)
-
-get_summary_stats(user_data)
-
-class_dis = get_class_distribution(user_data)
-
-def normalize_data(user_data):
-
-    # concatenate all the user data
-    df = pd.concat(user_data)
-
-    # the time column
-    tim = pd.DataFrame(df['time'])
-
-    # the class column
-    clas = pd.DataFrame(df['class'])
-
-    # drop time from the dataset so that we don't scale the timestamps
-    df.drop(['time', 'class'], axis=1, inplace=True)
-
-    # Get the headers from the list
-    headers = list(df)
-
-    scaler = StandardScaler()
-    scaled_values = pd.DataFrame(scaler.fit_transform(df), columns = headers, index = df.index)
-    
-    # concatenate the data after scaling it
-    df_new = pd.concat([tim, clas, scaled_values], axis=1)
-    df_new = df_new.astype({'class': 'int32'})
-    
-    return df_new
-
-normalized_data = normalize_data(user_data)
-normalized_data
-
-cor = normalized_data.iloc [0: , 2:]
-
-
-# calculate the correlation matrix
-corr = cor.corr()
-corr.to_csv('correlation.csv')
-
-# plot the heatmap
-plt.figure(1, figsize=(12, 10))
-
-ax = sn.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, annot=True, annot_kws={"fontsize":11, "weight": "bold"}, cmap="GnBu")
-ax.set_title('correlation between features', fontsize=20)
-
-plt.xticks(rotation=20, fontsize=13)
-plt.yticks(rotation=0, fontsize=13)
-bottom, top = ax.get_ylim()
-ax.set_ylim(bottom + 0.5, top - 0.5)
-
-# for tick in ax.get_xticklabels():
-#     tick.set_rotation(90)
-
-
-plt.savefig('corr_plot.png', dpi=500)
-plt.show()
-
-# for i in range(36):
-#     plt.figure(i, figsize=(20, 22))
-#     ax2 = normal_data[i].plot(x='time', y='class', kind='scatter')
-#     ax2.set_title('Distribution of classes', fontsize=20)
-#     #plt.xlim(0, 10000)
-#     folder = "./drive/My Drive/EMG_data_for_gestures-master/images/test/"
-#     os.makedirs(folder, exist_ok=True)
-#     plt.savefig('{}class_{}.png'.format(folder, i + 1), dpi=500)
-#     plt.show()
-#     break
 
 def normalize_df(df):
     # the time column
@@ -334,9 +181,7 @@ def train_valid_test_split(path = './EMG_data_for_gestures-master/'):
 
 training, validation, testing = train_valid_test_split()
 
-print(len(training))
-print(len(validation))
-print(len(testing))
+
 
 # fit and evaluate a model
 def evaluate_model(X_train, y_train, X_test, y_test):
@@ -390,6 +235,7 @@ def getXY(df):
     dataX = [df.iloc[window[0]:window[1] + 1,2:] for window in window_list]
     y = [i[1] for i in RMS_list]
     return rmsX, dataX, y
+
 
 results = []
 for i in range(36):
