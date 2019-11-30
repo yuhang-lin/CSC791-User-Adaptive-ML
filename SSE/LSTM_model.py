@@ -15,8 +15,8 @@ def encode_data(y_train, y_test):
         A one hot categorical encoding of train and test labels
 
     """
-    train_labels = tf.keras.utils.to_categorical(y_train, num_classes=10, dtype='int32')
-    test_labels = tf.keras.utils.to_categorical(y_test, num_classes=10, dtype='int32')
+    train_labels = tf.keras.utils.to_categorical(y_train, num_classes=6, dtype='int32')
+    test_labels = tf.keras.utils.to_categorical(y_test, num_classes=6, dtype='int32')
     return train_labels, test_labels
 
 
@@ -48,7 +48,7 @@ def evaluate_model(X_train, y_train, X_test, y_test):
     model.add(tf.keras.layers.Dropout(0.5))
     model.add(tf.keras.layers.Dense(100, activation='relu'))
     model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(), metrics=['accuracy'])
     # fit network
     model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=verbose)
     # evaluate model
