@@ -12,6 +12,7 @@ import os
 import csv
 import numpy as np
 import tensorflow as tf
+from statistics import mean
 
 
 def normalize_df(df):
@@ -203,16 +204,18 @@ def evaluate_model(X_train, y_train, X_test, y_test):
         The accuracy of the trained and evaluated LSTM model.
 
     """
-    verbose, epochs, batch_size = 0, 100, 32
+    verbose, epochs, batch_size = 0, 50, 32
     n_timesteps, n_features, n_outputs = 200, 8, y_train.shape[0]
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))    
-    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dropout(0.2))
     model.add(tf.keras.layers.Dense(100, activation='relu'))
     model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
-    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(), metrics=['accuracy'])
+    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(0.001), metrics=['accuracy'])
     # fit network
-    model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
+    
+    with tf.device('/device:GPU:0'):
+        model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
     # evaluate model
     # _, accuracy = model.evaluate(X_test, y_test, batch_size=batch_size)
 
@@ -238,7 +241,10 @@ def getXY(df):
 
 
 results = []
-for i in range(36):
+for i in range(5):
+    print("----------------------\n")
+    print("Training for user {}\n".format(i+1))
+    print("----------------------\n")
     trainRMSX, trainX, trainY = getXY(training[i])
     validRMSX, validX, validY = getXY(validation[i])
     # combine validatation and training together
@@ -256,5 +262,37 @@ for i in range(36):
     # train and test the model
     results.append(evaluate_model(trainX, trainY, testX, testY))
 
-print(results)
+
+
+accuracies = [val[0] for val in results]
+f1_scores = [val[1] for val in results]
+
+f = open("results.txt", "w+")
+
+f.write("Accuracies\n")
+f.write("----------------------\n")
+f.write("{}\n".format(accuracies))
+f.write("\n")
+
+f.write("F1 scores\n")
+f.write("----------------------\n")
+f.write("{}\n".format(f1_scores))
+f.write("\n")
+
+f.write("----------------------\n")
+f.write("----------------------\n")
+f.write("\n")
+
+f.write("Average accuracy over all users\n")
+f.write("----------------------\n")
+f.write("{}\n".format(mean(accuracies)))
+f.write("\n")
+
+f.write("Average F1 scores over all users\n")
+f.write("----------------------\n")
+f.write("{}\n".format(mean(f1_scores)))
+f.write("\n")
+
+f.close()
+
 
