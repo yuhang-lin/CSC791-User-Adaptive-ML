@@ -149,5 +149,5 @@ def getXY(df):
     # get the X and y from RMS list
     rmsX = [list(i[2:]) for i in RMS_list]
     dataX = [df.iloc[window[0]:window[1] + 1,2:] for window in window_list]
-    y = [i[1] for i in RMS_list]
+    y = [int(i[1]) - 1 for i in RMS_list] # map class from [1, 6] to [0, 5] for softmax activation
     return rmsX, dataX, y
