@@ -36,14 +36,14 @@ def evaluate_model(X_train, y_train, X_test, y_test):
         The accuracy of the trained and evaluated LSTM model.
 
     """
-    verbose, epochs, batch_size = 0, 100, 32
+    verbose, epochs, batch_size = 0, 200, 32
     n_timesteps, n_features, n_outputs = 200, 8, y_train.shape[0]
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))    
-    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dropout(0.1))
     model.add(tf.keras.layers.Dense(100, activation='relu'))
     model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
-    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(), metrics=['accuracy'])
+    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(0.001), metrics=['accuracy'])
     # fit network
     
     with tf.device('/device:GPU:0'):
@@ -56,7 +56,7 @@ def evaluate_model(X_train, y_train, X_test, y_test):
     y_pred = [np.argmax(x) for x in predicted_labels]
 
     acc = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average="macro")
+    f1 = f1_score(y_test, y_pred, average="micro")
 
     return [acc, f1]
 
