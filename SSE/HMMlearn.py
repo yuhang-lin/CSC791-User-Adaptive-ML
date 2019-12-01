@@ -1,8 +1,14 @@
 """
-    Performs (HMM model classification using hmmlearn
+    Performs  Hidden Markov Model(HMM) model classification
+    (using hmmlearn)
+
+    Classifying Hand Gestures from EMG Data
+    https://github.com/kunalnarangtheone/CSC591ML/tree/master/SSE
 
     Group:
-
+    Yuhang Lin          ylin34@ncsu.edu
+    Kunal Narang        knarang@ncsu.edu
+    Fogo Tunde-Onadele  oatundeo@ncsu.edu
 """
 
 import pandas as pd
@@ -41,7 +47,7 @@ def group_training_by_class(classes, x_train, y_train):
     x_train_in = [[] for _ in range(classes)]
     y_train_in = [[] for _ in range(classes)]
     for idx in range(len(x_train)):
-        class_idx = y_train[idx]
+        class_idx = int(y_train[idx])
         x_train_in[class_idx - 1].append(x_train[idx])
         y_train_in[class_idx - 1].append(y_train[idx])
     return x_train_in, y_train_in
@@ -66,7 +72,7 @@ def train_hmm_models_per_user(classes, x_train_in):
 
     hmm_models = [[] for _ in range(classes)]
     for class_idx in range(classes):
-        # model does not exist
+        # model exists
         if len(x_train_in[class_idx]) != 0:
             hmm_model = hmm.GaussianHMM().fit(x_train_in[class_idx])
             #hmm_model = hmm.MultinomialHMM().fit(x_train_in[class_idx])
