@@ -36,7 +36,7 @@ def evaluate_model(X_train, y_train, X_test, y_test):
         The accuracy of the trained and evaluated LSTM model.
 
     """
-    verbose, epochs, batch_size = 0, 200, 32
+    verbose, epochs, batch_size = 0, 100, 32
     n_timesteps, n_features, n_outputs = 200, 8, 6
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))    
