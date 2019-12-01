@@ -4,7 +4,7 @@ from preprocessEMG import train_valid_test_split, getXY
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
 import numpy as np
 import tensorflow as tf
@@ -14,10 +14,42 @@ from statistics import mean
 
 training, validation, testing = train_valid_test_split()
 
+def generate_plots(model_history, epochs):
+    """
+    A method that takes the model history of a trained model and plots its:
+    1. Training accuracy
+    2. Training loss
+    3. Validation accuracy
+    4. Validation loss
+    """
+    acc = model_history.history['acc']
+    val_acc = model_history.history['val_acc']
+    loss = model_history.history['loss']
+    val_loss = model_history.history['val_loss']
+    
+    plt.figure(1)
+    plt.suptitle('Accuracy learning curve', fontsize=20)
+    plt.xlabel('epochs', fontsize=14)
+    plt.ylabel('accuracy', fontsize=14)
+    plt.plot(acc, label='training accuracy')
+    plt.plot(val_acc, label='validation accuracy')
+    plt.xticks(np.arange(0, epochs, epochs/10))
+    plt.legend(loc="lower right")
+    plt.savefig("accuracy.png", dpi=300)
+    
+    plt.figure(2)
+    plt.suptitle('Loss learning curve', fontsize=20)
+    plt.xlabel('epochs', fontsize=14)
+    plt.ylabel('loss', fontsize=14)
+    plt.plot(loss, label='training loss')
+    plt.plot(val_loss, label='validation loss')
+    plt.xticks(np.arange(0, epochs, epochs/10))
+    plt.legend(loc="upper right")
+    plt.savefig("loss.png", dpi=300)
 
 
 # fit and evaluate a model
-def evaluate_model(X_train, y_train, X_test, y_test):
+def evaluate_model(X_train, y_train, X_test, y_test, epochs=50):
     """A function that trains an LSTM model and returns the accuracy on the test dataset.
 
     Parameters
@@ -36,19 +68,20 @@ def evaluate_model(X_train, y_train, X_test, y_test):
         The accuracy of the trained and evaluated LSTM model.
 
     """
-    verbose, epochs, batch_size = 0, 100, 32
+    verbose, batch_size = 0, 32
     n_timesteps, n_features, n_outputs = 200, 8, 6
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))    
-    model.add(tf.keras.layers.Dropout(0.1))
-    model.add(tf.keras.layers.Dense(100, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.3))
+    model.add(tf.keras.layers.Dense(32, activation='relu'))
     model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
-    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(0.001), metrics=['accuracy'])
+    model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(), metrics=['accuracy'])
     model.summary()
     # fit network
     
     with tf.device('/device:GPU:0'):
-        model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
+        history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, y_test))
+        
     # evaluate model
     # _, accuracy = model.evaluate(X_test, y_test, batch_size=batch_size)
 
@@ -58,12 +91,15 @@ def evaluate_model(X_train, y_train, X_test, y_test):
 
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred, average="micro")
+    
+    generate_plots(history, epochs)
 
     return [acc, f1]
 
 
 results = []
-for i in range(36):
+epochs = 50
+for i in range(1):
     print("----------------------\n")
     print("Training for user {}\n".format(i+1))
     print("----------------------\n")
@@ -82,7 +118,8 @@ for i in range(36):
     testY = np.asarray(testY)
 
     # train and test the model
-    results.append(evaluate_model(trainX, trainY, testX, testY))
+    results.append(evaluate_model(trainX, trainY, testX, testY, epochs))
+    
 
 
 
