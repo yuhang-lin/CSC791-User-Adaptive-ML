@@ -49,7 +49,8 @@ def generate_plots(subject, model_history):
     plt.xticks(np.arange(0, epochs, epochs/10))
     plt.legend(loc="upper right")
     plt.savefig("fig_lstm/loss{}.png".format(subject), dpi=300)
-    plt.show()
+    #plt.show()
+    plt.clf()
 
 
 
@@ -86,7 +87,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(100, input_shape=(n_timesteps,n_features)))    
     model.add(tf.keras.layers.Dropout(0.3))
-    model.add(tf.keras.layers.Dense(50, activation='relu'))
+    model.add(tf.keras.layers.Dense(100, activation='relu'))
     model.add(tf.keras.layers.Dense(n_outputs, activation='softmax'))
     model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(), 
                   metrics=['accuracy'])
