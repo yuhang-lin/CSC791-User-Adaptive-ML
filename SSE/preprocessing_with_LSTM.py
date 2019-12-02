@@ -50,7 +50,7 @@ def generate_plots(subject, model_history):
     plt.legend(loc="upper right")
     plt.savefig("fig_lstm/loss{}.png".format(subject), dpi=300)
     #plt.show()
-    plt.clf()
+    plt.close()
 
 
 
