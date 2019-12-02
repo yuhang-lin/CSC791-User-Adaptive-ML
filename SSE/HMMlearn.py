@@ -48,8 +48,10 @@ def group_training_by_class(classes, x_train, y_train):
     y_train_in = [[] for _ in range(classes)]
     for idx in range(len(x_train)):
         class_idx = int(y_train[idx])
-        x_train_in[class_idx - 1].append(x_train[idx])
-        y_train_in[class_idx - 1].append(y_train[idx])
+        #x_train_in[class_idx - 1].append(x_train[idx])
+        #y_train_in[class_idx - 1].append(y_train[idx])
+        x_train_in[class_idx].append(x_train[idx])
+        y_train_in[class_idx].append(y_train[idx])
     return x_train_in, y_train_in
 
 
@@ -69,12 +71,13 @@ def train_hmm_models_per_user(classes, x_train_in):
     hmm_models : list of hmm models (outer list -> hmm model)
         HMM models
     """
+    num_iterations = 10
 
     hmm_models = [[] for _ in range(classes)]
     for class_idx in range(classes):
         # model exists
         if len(x_train_in[class_idx]) != 0:
-            hmm_model = hmm.GaussianHMM().fit(x_train_in[class_idx])
+            hmm_model = hmm.GaussianHMM(n_iter=num_iterations).fit(x_train_in[class_idx])
             #hmm_model = hmm.MultinomialHMM().fit(x_train_in[class_idx])
             #hmm_model = hmm.MultinomialHMM(n_components = classes).fit(x_train_in[class_idx])
             hmm_models[class_idx].append(hmm_model)
@@ -125,7 +128,8 @@ def test_hmm_models_per_user(classes, x_test, hmm_models):
         # flatten list
         scores = [item for sublist in score_list for item in sublist]
         y_idx, y_score = max(enumerate(scores), key=operator.itemgetter(1))
-        y_pred.append(y_idx + 1)
+        #y_pred.append(y_idx + 1)
+        y_pred.append(y_idx)
     return y_pred
 
 
