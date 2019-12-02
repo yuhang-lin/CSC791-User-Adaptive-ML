@@ -20,6 +20,7 @@ from HMMlearn import evaluate_hmm_model
 #from sklearn.ensemble import ExtraTreesClassifier
 #from sklearn.neural_network import MLPClassifier
 
+from exportCSV import exportCSV
 
 # In[2]:
 
@@ -80,6 +81,9 @@ def evaluate_hmm():
         '''
     print("RMS! Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro_RMS), mean(f1_micro_RMS), mean(accuracy_RMS)))
     #print("Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro), mean(f1_micro), mean(accuracy)))
+    exportCSV(f1_macro_RMS, "hmm_f1_macro_RMS.csv")
+    exportCSV(f1_micro_RMS, "hmm_f1_micro_RMS.csv")
+    exportCSV(accuracy_RMS, "hmm_accuracy_RMS.csv")
     return
 
 # In[4]:
