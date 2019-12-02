@@ -77,7 +77,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
     #es = EarlyStopping(monitor='val_loss', mode='min', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
-    es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
+    #es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
     mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_acc', mode='max', save_best_only=True)
     #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor='val_loss', mode='min')
    
@@ -93,7 +93,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     # fit network
     
     with tf.device('/device:GPU:0'):
-        history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[es, mcp_save], 
+        history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[mcp_save], 
                             validation_data=(X_valid, y_valid))
         
     # evaluate model
