@@ -105,7 +105,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     y_pred = [np.argmax(x) for x in predicted_labels]
 
     acc = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average="micro")
+    f1 = f1_score(y_test, y_pred, average="macro")
     
     generate_plots(subject, history)
 
