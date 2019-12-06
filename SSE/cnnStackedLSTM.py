@@ -10,20 +10,12 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import tensorflow as tf
-from statistics import mean
+from statistics import mean, stdev
 from keras.callbacks import LearningRateScheduler, EarlyStopping, ModelCheckpoint
 from exportCSV import exportCSV
-from keras.layers import ConvLSTM2D
 from keras.models import Sequential
-from keras.layers import LSTM
-from keras.layers import TimeDistributed
-from keras.layers import Bidirectional
-from keras.layers import Dense, Dropout
-from keras.layers import Flatten
-from keras.layers import ConvLSTM2D
-from keras.layers import TimeDistributed
-from keras.layers.convolutional import Conv1D
-from keras.layers.convolutional import MaxPooling1D
+from keras.layers import Bidirectional, ConvLSTM2D, ConvLSTM2D, Dense, Dropout, Flatten, LSTM, TimeDistributed
+from keras.layers.convolutional import Conv1D, MaxPooling1D
 
 # fit and evaluate a model
 def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, epochs=50):
@@ -47,7 +39,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     """
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
-    n_steps = 4
+    n_steps = 8
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
@@ -64,10 +56,10 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu'), input_shape=(None, n_length, n_features)))
     model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
     model.add(TimeDistributed(Flatten()))
-    model.add(LSTM(50, activation='relu', return_sequences=True))
-    model.add(LSTM(50, activation='relu'))
+    model.add(LSTM(64, activation='relu', return_sequences=True))
+    model.add(LSTM(32, activation='relu'))
     model.add(Dropout(0.1))
-    model.add(Dense(32, activation='relu'))
+    model.add(Dense(16, activation='relu'))
     model.add(Dropout(0.1))
     model.add(Dense(n_outputs, activation='softmax'))
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -125,13 +117,16 @@ for i in range(36):
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
 
-f1_scores.insert(0, "cnnStackedLSTM")
-accuracies.insert(0, "cnnStackedLSTM")
+experiment_name = "cnnStackedLSTM"
 
+accuracies_2 = [experiment_name, mean(accuracies), stdev(accuracies)]
+accuracies_2.extend(accuracies)
+f1_scores_2 = [experiment_name, mean(f1_scores), stdev(f1_scores)]
+f1_scores_2.extend(f1_scores)
 
-exportCSV(f1_scores, "f1_cnnlstm.csv")
-exportCSV(accuracies, "accuracy_cnnlstm.csv")
-print(f1_scores)
-print(accuracies)
+exportCSV(accuracies_2, "accuracy_cnnlstm.csv")
+exportCSV(f1_scores_2, "f1_cnnlstm.csv")
 
+print(accuracies_2)
+print(f1_scores_2)
 
