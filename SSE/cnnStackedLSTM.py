@@ -59,7 +59,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     model.add(LSTM(50, activation='relu', return_sequences=True))
     model.add(LSTM(50, activation='relu'))
     model.add(Dropout(0.1))
-    model.add(Dense(16, activation='relu'))
+    model.add(Dense(32, activation='relu'))
     model.add(Dropout(0.1))
     model.add(Dense(n_outputs, activation='softmax'))
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
