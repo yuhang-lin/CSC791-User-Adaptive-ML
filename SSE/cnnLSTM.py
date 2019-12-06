@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from nn-base import generate_plots
 from preprocessEMG import train_valid_test_split, getXY
 
 from sklearn.metrics import accuracy_score
@@ -22,46 +23,6 @@ from keras.layers import ConvLSTM2D
 from keras.layers import TimeDistributed
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
-
-
-training, validation, testing = train_valid_test_split()
-
-def generate_plots(subject, model_history):
-    """
-    A method that takes the model history of a trained model and plots its:
-    1. Training accuracy
-    2. Training loss
-    3. Validation accuracy
-    4. Validation loss
-    """
-    acc = model_history.history['acc']
-    val_acc = model_history.history['val_acc']
-    loss = model_history.history['loss']
-    val_loss = model_history.history['val_loss']
-    epochs = len(acc)
-    
-    plt.figure(1 + int(subject))
-    plt.suptitle('Accuracy learning curve', fontsize=20)
-    plt.xlabel('epochs', fontsize=14)
-    plt.ylabel('accuracy', fontsize=14)
-    plt.plot(acc, label='training accuracy')
-    plt.plot(val_acc, label='validation accuracy')
-    plt.xticks(np.arange(0, epochs, epochs/10))
-    plt.legend(loc="lower right")
-    os.makedirs("fig_lstm", exist_ok=True)
-    plt.savefig("fig_lstm/accuracy{}.png".format(subject), dpi=300)
-    
-    plt.figure(200 + int(subject))
-    plt.suptitle('Loss learning curve', fontsize=20)
-    plt.xlabel('epochs', fontsize=14)
-    plt.ylabel('loss', fontsize=14)
-    plt.plot(loss, label='training loss')
-    plt.plot(val_loss, label='validation loss')
-    plt.xticks(np.arange(0, epochs, epochs/10))
-    plt.legend(loc="upper right")
-    plt.savefig("fig_lstm/loss{}.png".format(subject), dpi=300)
-    #plt.show()
-    plt.close()
 
 
 # fit and evaluate a model
@@ -106,14 +67,13 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     model.add(LSTM(100))
     model.add(Dropout(0.1))
     model.add(Dense(32, activation='relu'))
+    model.add(Dropout(0.1))
     model.add(Dense(n_outputs, activation='softmax'))
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
     # fit network
     
-    with tf.device('/device:GPU:0'):
-        hist = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[mcp_save], 
-                            validation_data=(X_valid, y_valid))
+    hist = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[mcp_save], validation_data=(X_valid, y_valid))
     
 #     print("printing keys in the hist")
 #     for key in hist.history:
@@ -133,7 +93,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
 
     return [acc, f1]
 
-
+training, validation, testing = train_valid_test_split()
 results = []
 epochs = 200
 for i in range(36):
