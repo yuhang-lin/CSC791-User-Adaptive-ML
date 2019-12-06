@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from nn-base import generate_plots
+from evaluateBase import generate_plots
 from preprocessEMG import train_valid_test_split, getXY
 
 from sklearn.metrics import accuracy_score
