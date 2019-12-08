@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from numpy.random import seed
+seed(1)
+from tensorflow import set_random_seed
+set_random_seed(2)
+
 from preprocessEMG import train_valid_test_split, getXY
 from evaluateBase import generate_plots
 
@@ -9,7 +14,7 @@ from sklearn.metrics import f1_score
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
 from statistics import mean, stdev
 from keras.callbacks import LearningRateScheduler, EarlyStopping, ModelCheckpoint
 from exportCSV import exportCSV
@@ -23,15 +28,15 @@ def build_model(n_length, n_features, n_outputs):
     model = Sequential()
     #model.add(TimeDistributed(Conv2D(64, (3, 3), strides=(2, 2), activation='relu'), input_shape=(None, n_length, n_features)))
     #model.add(TimeDistributed(MaxPooling2D(pool_size=2)))
-    model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu', kernel_regularizer=l2(0.01)), 
-                              input_shape=(None, n_length, n_features)))
+    model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu', kernel_regularizer=l2(0.01)), input_shape=(None, n_length, n_features)))
     model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
     model.add(TimeDistributed(Flatten()))
-    model.add(LSTM(50, activation='relu', return_sequences=True))
-    model.add(LSTM(50, activation='relu'))
-    model.add(Dropout(0.5))
+    model.add(LSTM(50, activation='relu', recurrent_regularizer=l2(0.01), return_sequences=True))
+    #model.add(Dropout(0.5))
+    model.add(LSTM(50, activation='relu', recurrent_regularizer=l2(0.01)))
+    #model.add(Dropout(0.5))
     model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))
-    model.add(Dropout(0.5))
+    #model.add(Dropout(0.5))
     model.add(Dense(n_outputs, activation='softmax'))
     opt = Adam()
     model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
@@ -81,7 +86,7 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50):
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
-    es = EarlyStopping(monitor='val_loss', mode='min', min_delta=0.001, patience=7, verbose=1, restore_best_weights=True)
+    es = EarlyStopping(monitor='val_loss', mode='min', patience=7, verbose=1, restore_best_weights=True)
     #es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
     #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
     mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_loss', mode='min')
@@ -155,7 +160,7 @@ else:
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
 
-experiment_name = "cnnStackedLSTM-useL2-not_restore"
+experiment_name = "cnnStackedLSTM"
 
 accuracies_2 = [experiment_name, mean(accuracies), stdev(accuracies)]
 accuracies_2.extend(accuracies)
