@@ -16,32 +16,34 @@ from exportCSV import exportCSV
 from keras.models import Sequential
 from keras.layers import Bidirectional, ConvLSTM2D, ConvLSTM2D, Dense, Dropout, Flatten, LSTM, TimeDistributed
 from keras.layers.convolutional import Conv1D, Conv2D, MaxPooling1D, MaxPooling2D
+from keras.optimizers import Adam
+from keras.regularizers import l2
 
 def build_model(n_length, n_features, n_outputs):
     model = Sequential()
     #model.add(TimeDistributed(Conv2D(64, (3, 3), strides=(2, 2), activation='relu'), input_shape=(None, n_length, n_features)))
     #model.add(TimeDistributed(MaxPooling2D(pool_size=2)))
-    model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu'), input_shape=(None, n_length, n_features)))
+    model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu', kernel_regularizer=l2(0.01)), 
+                              input_shape=(None, n_length, n_features)))
     model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
     model.add(TimeDistributed(Flatten()))
     model.add(LSTM(50, activation='relu', return_sequences=True))
     model.add(LSTM(50, activation='relu'))
-    model.add(Dropout(0.1))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.5))
+    model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))
+    model.add(Dropout(0.5))
     model.add(Dense(n_outputs, activation='softmax'))
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.summary()
+    opt = Adam()
+    model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
     return model
 
-def test_model(subject, X_test, y_test):
+def test_model(subject, model, X_test, y_test):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
     n_steps = 8
     n_length = window_size // n_steps
     X_test = X_test.reshape(X_test.shape[0], n_steps, n_length, n_features)
-    model = build_model(n_length, n_features, n_outputs)
-    model.load_weights('.mdl_wts.hdf5')
+    
     predicted_labels = model.predict(X_test, batch_size=batch_size)
 
     y_pred = [np.argmax(x) for x in predicted_labels]
@@ -79,18 +81,20 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50):
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
-    #es = EarlyStopping(monitor='val_loss', mode='min', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
+    es = EarlyStopping(monitor='val_loss', mode='min', min_delta=0.001, patience=7, verbose=1, restore_best_weights=True)
     #es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
-    mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
-    #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor='val_loss', mode='min')
+    #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
+    mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_loss', mode='min')
    
     X_train = X_train.reshape(X_train.shape[0], n_steps, n_length, n_features)
     X_valid = X_valid.reshape(X_valid.shape[0], n_steps, n_length, n_features)
     
     
     model = build_model(n_length, n_features, n_outputs)
+    model.summary()
     # fit network
-    hist = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[mcp_save], validation_data=(X_valid, y_valid))
+    hist = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[es, mcp_save], validation_data=(X_valid, y_valid))
+    return model
     
 #     print("printing keys in the hist")
 #     for key in hist.history:
@@ -98,8 +102,8 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50):
 
 training, validation, testing = train_valid_test_split()
 results = []
-epochs = 200
-individual_training = False
+epochs = 80
+individual_training = True
 if individual_training:
     for i in range(36):
         print("----------------------\n")
@@ -122,8 +126,8 @@ if individual_training:
         testY = np.asarray(testY)  
 
         # train and test the model
-        train_model(i + 1, trainX, trainY, validX, validY, epochs)
-        results.append(test_model(i + 1, testX, testY))
+        model = train_model(i + 1, trainX, trainY, validX, validY, epochs)
+        results.append(test_model(i + 1, model, testX, testY))
 else:
     combineTrainX = []
     combineTrainY = []
@@ -141,17 +145,17 @@ else:
     combineTrainY = np.asarray(combineTrainY)
     combineValidX = np.asarray([X.values for X in combineValidX])
     combineValidY = np.asarray(combineValidY)
-    train_model(i + 1, combineTrainX, combineTrainY, combineValidX, combineValidY, epochs)
+    model = train_model(i + 1, combineTrainX, combineTrainY, combineValidX, combineValidY, epochs)
     for i in range(36):
         testRMSX, testX, testY = getXY(testing[i])
         testX = np.asarray([X.values for X in testX])
         testY = np.asarray(testY)
-        results.append(test_model(i + 1, testX, testY))
+        results.append(test_model(i + 1, model, testX, testY))
 
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
 
-experiment_name = "cnnStackedLSTM"
+experiment_name = "cnnStackedLSTM-useL2-not_restore"
 
 accuracies_2 = [experiment_name, mean(accuracies), stdev(accuracies)]
 accuracies_2.extend(accuracies)
