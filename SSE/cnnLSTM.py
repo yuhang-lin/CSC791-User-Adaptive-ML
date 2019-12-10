@@ -1,28 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from evaluateBase import generate_plots
 from preprocessEMG import train_valid_test_split, getXY
+from evaluateBase import generate_plots
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import tensorflow as tf
-from statistics import mean
+from statistics import mean, stdev
 from keras.callbacks import LearningRateScheduler, EarlyStopping, ModelCheckpoint
 from exportCSV import exportCSV
-from keras.layers import ConvLSTM2D
 from keras.models import Sequential
-from keras.layers import LSTM
-from keras.layers import TimeDistributed
-from keras.layers import Dense, Dropout
-from keras.layers import Flatten
-from keras.layers import ConvLSTM2D
-from keras.layers import TimeDistributed
-from keras.layers.convolutional import Conv1D
-from keras.layers.convolutional import MaxPooling1D
+from keras.layers import Bidirectional, ConvLSTM2D, ConvLSTM2D, Dense, Dropout, Flatten, LSTM, TimeDistributed
+from keras.layers.convolutional import Conv1D, Conv2D, MaxPooling1D, MaxPooling2D
+from keras.optimizers import Adam
+from keras.regularizers import l2
 
 
 # fit and evaluate a model
@@ -53,7 +47,7 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
     #es = EarlyStopping(monitor='val_loss', mode='min', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
     #es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
-    mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
+    mcp_save = ModelCheckpoint('mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
     #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor='val_loss', mode='min')
    
     X_train = X_train.reshape(X_train.shape[0], n_steps, n_length, n_features)
@@ -75,13 +69,9 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     
     hist = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=[mcp_save], validation_data=(X_valid, y_valid))
     
-#     print("printing keys in the hist")
-#     for key in hist.history:
-#         print(key)
-    
     # evaluate model
     # _, accuracy = model.evaluate(X_test, y_test, batch_size=batch_size)
-    model.load_weights('.mdl_wts.hdf5')
+    model.load_weights('mdl_wts.hdf5')
     predicted_labels = model.predict(X_test, batch_size=batch_size)
 
     y_pred = [np.argmax(x) for x in predicted_labels]
@@ -124,13 +114,16 @@ for i in range(36):
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
 
-f1_scores.insert(0, "cnnlstm")
-accuracies.insert(0, "cnnlstm")
+experiment_name = "cnnlstm"
 
+accuracies_2 = [experiment_name, mean(accuracies), stdev(accuracies)]
+accuracies_2.extend(accuracies)
+f1_scores_2 = [experiment_name, mean(f1_scores), stdev(f1_scores)]
+f1_scores_2.extend(f1_scores)
 
-exportCSV(f1_scores, "f1_cnnlstm.csv")
-exportCSV(accuracies, "accuracy_cnnlstm.csv")
-print(f1_scores)
-print(accuracies)
+exportCSV(accuracies_2, "accuracy_cnnlstm.csv")
+exportCSV(f1_scores_2, "f1_cnnlstm.csv")
 
+print(f1_scores_2)
+print(accuracies_2)
 
