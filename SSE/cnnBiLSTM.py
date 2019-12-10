@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import tensorflow as tf
-from statistics import mean
+from statistics import mean, stdev
 from keras.callbacks import LearningRateScheduler, EarlyStopping, ModelCheckpoint
 from exportCSV import exportCSV
 from keras.layers import ConvLSTM2D
