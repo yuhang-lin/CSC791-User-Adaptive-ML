@@ -125,12 +125,17 @@ for i in range(36):
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
 
-f1_scores.insert(0, "cnnBiLstm")
-accuracies.insert(0, "cnnBiLstm")
 
+experiment_name = "cnnBiLstm"
 
-exportCSV(f1_scores, "f1_cnnbilstm.csv")
-exportCSV(accuracies, "accuracy_cnnbilstm.csv")
+accuracies_2 = [experiment_name, mean(accuracies), stdev(accuracies)]
+accuracies_2.extend(accuracies)
+f1_scores_2 = [experiment_name, mean(f1_scores), stdev(f1_scores)]
+f1_scores_2.extend(f1_scores)
+
+exportCSV(accuracies_2, "accuracy_cnnbilstm.csv")
+exportCSV(f1_scores_2, "f1_cnnbilstm.csv")
+
 print(f1_scores)
 print(accuracies)
 
