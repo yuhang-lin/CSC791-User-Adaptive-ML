@@ -57,7 +57,7 @@ def group_training_by_class(classes, x_train, y_train):
 
 def train_hmm_models_per_user(classes, x_train_in):
     """
-    Make class number of hmm models for 1 user.
+    Makes class number of hmm models for 1 user.
 
     Parameters
     ----------
@@ -71,7 +71,9 @@ def train_hmm_models_per_user(classes, x_train_in):
     hmm_models : list of hmm models (outer list -> hmm model)
         HMM models
     """
-    num_iterations = 10
+    # GaussianHMM
+    # GMMHMM
+    num_iterations = 100
 
     hmm_models = [[] for _ in range(classes)]
     for class_idx in range(classes):
