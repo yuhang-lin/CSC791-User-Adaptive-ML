@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import tensorflow as tf
-from statistics import mean
+from statistics import mean, stdev
 from keras.callbacks import LearningRateScheduler, EarlyStopping, ModelCheckpoint
 from exportCSV import exportCSV
 from keras.layers import ConvLSTM2D
@@ -50,10 +50,9 @@ def evaluate_model(subject, X_train, y_train, X_valid, y_valid, X_test, y_test, 
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
     #es = EarlyStopping(monitor='val_loss', mode='min', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
     #es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
-    mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
-    #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor='val_loss', mode='min')
+    #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
+    mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_loss', mode='min', save_best_only=True)
    
-    
     model = Sequential()
     model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(n_timesteps,n_features)))
     model.add(MaxPooling1D(pool_size=2))
@@ -113,12 +112,19 @@ def main():
     accuracies = [val[0] for val in results]
     f1_scores = [val[1] for val in results]
 
-    f1_scores.insert(0, "cnn")
-    accuracies.insert(0, "cnn")
-    exportCSV(f1_scores, "f1_cnn.csv")
-    exportCSV(accuracies, "accuracy_cnn.csv")
-    print(f1_scores)
-    print(accuracies)
+    
+    experiment_name = "cnn"
+
+    accuracies_2 = [experiment_name, mean(accuracies), stdev(accuracies)]
+    accuracies_2.extend(accuracies)
+    f1_scores_2 = [experiment_name, mean(f1_scores), stdev(f1_scores)]
+    f1_scores_2.extend(f1_scores)
+
+    exportCSV(accuracies_2, "accuracy_cnn.csv")
+    exportCSV(f1_scores_2, "f1_cnn.csv")
+    print(accuracies_2)
+    print(f1_scores_2)
+    
 
 if __name__ == "__main__"
     main()
