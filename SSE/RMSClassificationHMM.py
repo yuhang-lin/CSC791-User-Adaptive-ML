@@ -15,7 +15,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
 from statistics import mean
 
-from HMMlearn import evaluate_hmm_model
+from HMMlearn import evaluate_hmm_model, group_training_by_class, train_hmm_models_per_user, test_hmm_models_per_user
 #from sklearn.ensemble import RandomForestClassifier
 #from sklearn.ensemble import ExtraTreesClassifier
 #from sklearn.neural_network import MLPClassifier
@@ -31,7 +31,7 @@ training, validation, testing = train_valid_test_split()
 # In[3]:
 
 
-def evaluate_hmm():
+def evaluate_user_hmms():
     f1_macro_RMS = []
     f1_micro_RMS = []
     accuracy_RMS = []
@@ -86,8 +86,78 @@ def evaluate_hmm():
     exportCSV(accuracy_RMS, "hmm_accuracy_RMS.csv")
     return
 
+
 # In[4]:
 
 
-evaluate_hmm()
+def evaluate_single_hmm():
+    f1_macro_RMS = []
+    f1_micro_RMS = []
+    accuracy_RMS = []
+    f1_macro = []
+    f1_micro = []
+    accuracy = []
+    combineTrainX = []
+    combineTrainY = []
+    for i in range(36):
+        # print("combining data: at user {}".format(i))
+        trainRMSX, trainX, trainY = getXY(training[i])
+        validRMSX, validX, validY = getXY(validation[i])
+        # combine validatation and training together
+        trainRMSX.extend(validRMSX)
+        trainX.extend(validX)
+        trainY.extend(validY)
 
+        combineTrainX.extend(trainRMSX)
+        combineTrainY.extend(trainY)
+        combineTrainY = [int(floatclass) for floatclass in combineTrainY]
+
+    # train
+    # Reorder train data by class
+    classes = 6
+    x_train_in, _ = group_training_by_class(classes, combineTrainX, combineTrainY)
+    # Make models for each class
+    hmm_models = train_hmm_models_per_user(classes, x_train_in)
+
+    # test the model for each user
+    for i in range(36):
+        print("testing: at user {}".format(i))
+        testRMSX, testX, testY = getXY(testing[i])
+        # classes as ints
+        testY = [int(floatclass) for floatclass in testY]
+
+        # RMS windows
+        # test the model
+        # Classify each sample
+        predictRMSY = test_hmm_models_per_user(classes, testRMSX, hmm_models)
+        # evaluate the model
+        f1_macro_RMS.append(f1_score(testY, predictRMSY, average='macro'))
+        f1_micro_RMS.append(f1_score(testY, predictRMSY, average='micro'))
+        accuracy_RMS.append(accuracy_score(testY, predictRMSY))
+        #print("\t RMS! Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro_RMS), mean(f1_micro_RMS), mean(accuracy_RMS)))
+
+        '''
+        # Raw windows
+        # train and test the model
+        predictY, _, _ = evaluate_hmm_model(trainX, trainY, testX, testY)
+        # evaluate the model 
+        f1_macro.append(f1_score(testY, predictY, average='macro'))
+        f1_micro.append(f1_score(testY, predictY, average='micro'))
+        accuracy.append(accuracy_score(testY, predictY))
+        '''
+    print("RMS! Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro_RMS), mean(f1_micro_RMS), mean(accuracy_RMS)))
+    #print("Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro), mean(f1_micro), mean(accuracy)))
+    exportCSV(f1_macro_RMS, "hmm_f1_macro_RMS.csv")
+    exportCSV(f1_micro_RMS, "hmm_f1_micro_RMS.csv")
+    exportCSV(accuracy_RMS, "hmm_accuracy_RMS.csv")
+    return
+
+
+
+
+
+# In[5]:
+
+
+evaluate_user_hmms()
+#evaluate_single_hmm()
