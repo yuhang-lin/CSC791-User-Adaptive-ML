@@ -136,7 +136,6 @@ f1_scores_2.extend(f1_scores)
 exportCSV(accuracies_2, "accuracy_cnnbilstm.csv")
 exportCSV(f1_scores_2, "f1_cnnbilstm.csv")
 
-print(f1_scores)
-print(accuracies)
-
+print(f1_scores_2)
+print(accuracies_2)
 
