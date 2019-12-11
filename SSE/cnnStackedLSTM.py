@@ -41,9 +41,9 @@ from keras.regularizers import l2
 def build_model(n_length, n_features, n_outputs, individual_training=False):
     model = Sequential()
     model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu', kernel_regularizer=l2(0.05)), 
-                              input_shape=(None, n_length, n_features)))
+                                  input_shape=(None, n_length, n_features)))
     model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
-    model.add(TimeDistributed(Flatten())) 
+    model.add(TimeDistributed(Flatten()))
     if individual_training:
         model.add(LSTM(50, activation='relu', return_sequences=True))
         model.add(LSTM(50, activation='relu'))
@@ -61,10 +61,12 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
     model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
     return model
 
-def test_model(subject, model, X_test, y_test):
+def test_model(subject, model, X_test, y_test, individual_training):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
     n_steps = 8
+    if individual_training:
+        n_step = 4 
     n_length = window_size // n_steps
     X_test = X_test.reshape(X_test.shape[0], n_steps, n_length, n_features)
     
@@ -100,6 +102,8 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
     n_steps = 8
+    if individual_training:
+        n_step = 4  
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
@@ -121,7 +125,7 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
 training, validation, testing = train_valid_test_split()
 results = []
 epochs = 160
-individual_training = False
+individual_training = True
 if individual_training:
     for i in range(36):
         print("----------------------\n")
@@ -142,7 +146,7 @@ if individual_training:
 
         # train and test the model
         model = train_model(i + 1, trainX, trainY, validX, validY, epochs, individual_training)
-        results.append(test_model(i + 1, model, testX, testY))
+        results.append(test_model(i + 1, model, testX, testY, individual_training))
 else:
     combineTrainX = []
     combineTrainY = []
@@ -165,7 +169,7 @@ else:
         testRMSX, testX, testY = getXY(testing[i])
         testX = np.asarray([X.values for X in testX])
         testY = np.asarray(testY)
-        results.append(test_model(i + 1, model, testX, testY))
+        results.append(test_model(i + 1, model, testX, testY, individual_training))
 
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
@@ -182,7 +186,7 @@ if individual_training:
     exportCSV(f1_scores_2, "f1_cnnStackedLSTM_indiv.csv")
 else:
     exportCSV(accuracies_2, "accuracy_cnnStackedLSTM_agg.csv")
-    exportCSV(f1_scores_2, "f1_cnnStackedLSTM_indiv.csv")
+    exportCSV(f1_scores_2, "f1_cnnStackedLSTM_agg.csv")
 
 print(accuracies_2)
 print(f1_scores_2)
