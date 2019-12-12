@@ -4,6 +4,12 @@
 We used EMG data for gestures Data Set, which is available on [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/machine-learning-databases/00481/EMG_data_for_gestures-master.zip).
 
 ## Data prepocessing
+We did the following steps for preprocessing:
+1. Dropped class 0 and 7 from the dataset
+2. Imputed missing values
+3. Partitioned data into window sizes of 200ms with stride of 100ms
+4. For modeling, we split the data into 50:25:25 for train, validation and testing respectively.
+
 
 ## Requirements for running
 sklearn  
