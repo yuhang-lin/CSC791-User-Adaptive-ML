@@ -1,26 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# import os
-# os.environ['PYTHONHASHSEED'] = '0'
-# os.environ['CUDA_VISIBLE_DEVICES']='-1'
-# os.environ['TF_CUDNN_USE_AUTOTUNE'] ='0'
-
-# import numpy as np
-# import random as rn
-# import tensorflow as tf
-
-# rn.seed(1)
-# np.random.seed(1)
-# from tensorflow import set_random_seed
-# set_random_seed(1)
-
-# from keras import backend as k
-# config = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1,
-# allow_soft_placement=True, device_count = {'CPU': 1})
-# sess = tf.Session(graph=tf.get_default_graph(),config=config)
-# k.set_session(sess)
-
 from preprocessEMG import train_valid_test_split, getXY
 from evaluateBase import generate_plots
 
@@ -44,7 +24,6 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
                                   input_shape=(None, n_length, n_features)))
     model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
     model.add(TimeDistributed(Flatten()))
-    individual_training = True
     if individual_training:
         model.add(LSTM(50, activation='relu', return_sequences=True))
         model.add(LSTM(50, activation='relu'))
@@ -65,7 +44,6 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
 def test_model(subject, model, X_test, y_test, individual_training):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
-    individual_training = True
     n_steps = 8
     if individual_training:
         n_steps = 4 
@@ -103,16 +81,12 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
     """
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
-    individual_training = True
     n_steps = 8
     if individual_training:
         n_steps = 4  
     n_length = window_size // n_steps
     
-    #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
     es = EarlyStopping(monitor='val_loss', mode='min', patience=7, verbose=1, restore_best_weights=True)
-    #es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.001, patience=15, verbose=1, restore_best_weights=True)
-    #mcp_save = ModelCheckpoint('.mdl_wts.hdf5', monitor='val_accuracy', mode='max', save_best_only=True)
     mcp_save = ModelCheckpoint('mdl_wts.hdf5', monitor='val_loss', mode='min')
    
     X_train = X_train.reshape(X_train.shape[0], n_steps, n_length, n_features)
