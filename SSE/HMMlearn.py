@@ -73,7 +73,7 @@ def train_hmm_models_per_user(classes, x_train_in):
     """
     # GaussianHMM
     # GMMHMM
-    num_iterations = 100
+    num_iterations = 10
 
     hmm_models = [[] for _ in range(classes)]
     for class_idx in range(classes):

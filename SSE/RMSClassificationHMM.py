@@ -10,6 +10,7 @@
 # In[3]:
 
 import numpy as np
+import pandas as pd
 from preprocessEMG import train_valid_test_split, getXY
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
@@ -51,17 +52,6 @@ def evaluate_user_hmms():
         trainY = [int(floatclass) for floatclass in trainY]
         testY = [int(floatclass) for floatclass in testY]
 
-        '''
-        # get input in list of list format (RMS inputs are already as such)
-        # currently 3D - what to do?
-        trainX = np.asarray([X.values.tolist() for X in trainX])
-        testX = np.asarray([X.values.tolist() for X in testX])
-        # trainX.reshape()
-        # testX.reshape()
-        print("trainX shape: {}".format(trainX.shape))
-        print("testX shape: {}".format(testX.shape))
-        '''
-
         # RMS windows
         # train and test the model
         predictRMSY, _, _ = evaluate_hmm_model(trainRMSX, trainY, testRMSX, testY)
@@ -70,7 +60,23 @@ def evaluate_user_hmms():
         f1_micro_RMS.append(f1_score(testY, predictRMSY, average='micro'))
         accuracy_RMS.append(accuracy_score(testY, predictRMSY))
 
-        '''
+        # get input in list of list format (RMS inputs are already as such)
+        # from 3D
+        trainX = pd.concat(trainX)
+        testX = pd.concat(testX)
+        trainX = trainX.values.tolist()
+        testX = testX.values.tolist()
+        # trainX.reshape()
+        # testX.reshape()
+        # print("trainX shape: {}".format(trainX.shape))
+        # print("testX shape: {}".format(testX.shape))
+
+        # 200 for each value
+        trainY_expand = []
+        testY_expand = []
+        #for val in trainY:
+
+
         # Raw windows
         # train and test the model
         predictY, _, _ = evaluate_hmm_model(trainX, trainY, testX, testY)
@@ -78,9 +84,9 @@ def evaluate_user_hmms():
         f1_macro.append(f1_score(testY, predictY, average='macro'))
         f1_micro.append(f1_score(testY, predictY, average='micro'))
         accuracy.append(accuracy_score(testY, predictY))
-        '''
+
     print("RMS! Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro_RMS), mean(f1_micro_RMS), mean(accuracy_RMS)))
-    #print("Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro), mean(f1_micro), mean(accuracy)))
+    # print("RAW! Macro-F1: {}, Micro-F1: {}, Accuracy: {}".format(mean(f1_macro), mean(f1_micro), mean(accuracy)))
     exportCSV(f1_macro_RMS, "hmm_f1_macro_RMS.csv")
     exportCSV(f1_micro_RMS, "hmm_f1_micro_RMS.csv")
     exportCSV(accuracy_RMS, "hmm_accuracy_RMS.csv")
