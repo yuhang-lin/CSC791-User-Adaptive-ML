@@ -12,7 +12,7 @@ We did the following steps for preprocessing:
 
 
 ## Requirements for running
-sklearn  
+sklearn  0.19.1
 keras  
 tensorflow > 1.13.1  
 hmmlearn  
@@ -30,9 +30,10 @@ However, you can also train individual models if you set individual_training=Tru
 
 ## Baseline models
 ```
-LSTM
-KNN
-Random Forest
-MLP
-Extremely Randomized Trees
+LSTM.py # LSTM
+RMS_full_features-Aggregated.py # full feature set, aggregated training
+RMS_full_features.py # full feature set, individual training
+RMS_limited_features-Aggregated.py # limited feature set, aggregated training
+RMS_limited_features.py # limited feature set, individual training
+RMSClassificationHMM.py # HMM model using RMS as data
 ```
