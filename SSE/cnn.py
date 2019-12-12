@@ -40,6 +40,7 @@ from keras.regularizers import l2
 
 def build_model(n_length, n_features, n_outputs, individual_training=False):
     model = Sequential()
+    individual_training = True
     if individual_training:
         model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(n_length,n_features)))
         model.add(MaxPooling1D(pool_size=2))

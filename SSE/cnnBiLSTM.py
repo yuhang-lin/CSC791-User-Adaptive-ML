@@ -38,8 +38,9 @@ from keras.layers.convolutional import Conv1D, Conv2D, MaxPooling1D, MaxPooling2
 from keras.optimizers import Adam
 from keras.regularizers import l2
 
-def build_model(n_length, n_features, n_outputs, individual_training=False):
+def build_model(n_length, n_features, n_outputs, individual_training):
     model = Sequential()
+    individual_training = True
     if individual_training:
         model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu'), 
                                   input_shape=(None, n_length, n_features)))
@@ -66,10 +67,10 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
 def test_model(subject, model, X_test, y_test, individual_training):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
+    individual_training = True
+    n_steps = 8
     if individual_training:
         n_step = 4
-    else:
-        n_steps = 8
     n_length = window_size // n_steps
     X_test = X_test.reshape(X_test.shape[0], n_steps, n_length, n_features)
     
@@ -104,10 +105,10 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
     """
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
+    individual_training = True
+    n_steps = 8
     if individual_training:
         n_step = 4
-    else:
-        n_steps = 8
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))

@@ -40,6 +40,7 @@ from keras.regularizers import l2
 
 def build_model(n_length, n_features, n_outputs, individual_training=False):
     model = Sequential()
+    individual_training = True
     if individual_training:
         model.add(TimeDistributed(Conv1D(filters=64, kernel_size=3, activation='relu'), 
                                   input_shape=(None, n_length, n_features)))
@@ -63,10 +64,13 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
     model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
     return model
 
-def test_model(subject, model, X_test, y_test):
+def test_model(subject, model, X_test, y_test, individual_training):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
     n_steps = 8
+    individual_training = True
+    if individual_training:
+        n_steps = 4
     n_length = window_size // n_steps
     X_test = X_test.reshape(X_test.shape[0], n_steps, n_length, n_features)
     
@@ -101,10 +105,10 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
     """
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
+    individual_training = True
+    n_steps = 8
     if individual_training:
         n_step = 4
-    else:
-        n_steps = 8
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
@@ -147,7 +151,7 @@ if individual_training:
 
         # train and test the model
         model = train_model(i + 1, trainX, trainY, validX, validY, epochs, individual_training)
-        results.append(test_model(i + 1, model, testX, testY))
+        results.append(test_model(i + 1, model, testX, testY, individual_training))
 else:
     combineTrainX = []
     combineTrainY = []
@@ -170,7 +174,7 @@ else:
         testRMSX, testX, testY = getXY(testing[i])
         testX = np.asarray([X.values for X in testX])
         testY = np.asarray(testY)
-        results.append(test_model(i + 1, model, testX, testY))
+        results.append(test_model(i + 1, model, testX, testY, individual_training))
 
 accuracies = [val[0] for val in results]
 f1_scores = [val[1] for val in results]
