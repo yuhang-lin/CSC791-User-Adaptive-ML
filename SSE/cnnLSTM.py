@@ -67,8 +67,8 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
 def test_model(subject, model, X_test, y_test, individual_training):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
-    n_steps = 8
     individual_training = True
+    n_steps = 8
     if individual_training:
         n_steps = 4
     n_length = window_size // n_steps
@@ -108,7 +108,7 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
     individual_training = True
     n_steps = 8
     if individual_training:
-        n_step = 4
+        n_steps = 4
     n_length = window_size // n_steps
     
     #annealer = LearningRateScheduler(lambda x: 1e-3 * 0.95 ** (x + epochs))
