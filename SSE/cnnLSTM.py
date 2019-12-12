@@ -46,7 +46,6 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
 def test_model(subject, model, X_test, y_test, individual_training):
     verbose, batch_size = 0, 32
     window_size, n_features, n_outputs = 200, 8, 6
-    individual_training = True
     n_steps = 8
     if individual_training:
         n_steps = 4
