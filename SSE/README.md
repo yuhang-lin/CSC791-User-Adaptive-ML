@@ -12,8 +12,8 @@ We did the following steps for preprocessing:
 
 
 ## Requirements for running
-sklearn  0.19.1
-keras  
+sklearn  0.19.1  
+keras 
 tensorflow > 1.13.1  
 hmmlearn  
 python > 3.0  
@@ -26,7 +26,7 @@ python3 cnnBiLSTM.py # CNN + Bidirectional LSTM
 python3 cnnStackedLSTM.py # CNN + Stacked LSTM
 ```
 By default, the main models use aggreagated training, which performs better than invidual training according to our experiments.
-However, you can also train individual models if you set individual_training=True in the code.
+However, you can also train individual models if you set `individual_training=True` in the code.
 
 ## Baseline models
 ```
