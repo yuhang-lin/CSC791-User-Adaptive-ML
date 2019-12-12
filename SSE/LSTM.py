@@ -80,7 +80,7 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
 training, validation, testing = train_valid_test_split()
 results = []
 epochs = 160
-individual_training = True
+individual_training = False
 if individual_training:
     for i in range(36):
         print("----------------------\n")
