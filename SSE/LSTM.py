@@ -22,7 +22,7 @@ def build_model(n_length, n_features, n_outputs, individual_training=False):
     model = Sequential()
     model.add(LSTM(100, input_shape=(n_length,n_features)))  
     model.add(Dropout(0.3))
-    model.add(Dense(32, activation='relu'))
+    model.add(Dense(100, activation='relu'))
     model.add(Dense(n_outputs, activation='softmax'))
     opt = Adam()
     model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
@@ -80,7 +80,7 @@ def train_model(subject, X_train, y_train, X_valid, y_valid, epochs=50, individu
 training, validation, testing = train_valid_test_split()
 results = []
 epochs = 160
-individual_training = False
+individual_training = True
 if individual_training:
     for i in range(36):
         print("----------------------\n")
